@@ -7,11 +7,21 @@ public class Interactable : MonoBehaviour, IInteractable
     [SerializeField] private bool isEnabled = true;
     [SerializeField] private UnityEvent onInteract;
 
-    public string DisplayName => displayName;
-    public bool CanInteract() => isEnabled;
+    private PhotoTarget photoTarget; // Reference to our target script
     private Outline outline;
+
+    public string DisplayName => displayName;
+
+    // This now checks if the object was already photographed!
+    public bool CanInteract()
+    {
+        if (photoTarget != null && photoTarget.isCaptured) return false;
+        return isEnabled;
+    }
+
     private void Awake()
     {
+        photoTarget = GetComponent<PhotoTarget>();
         outline = gameObject.AddComponent<Outline>();
         outline.OutlineMode = Outline.Mode.OutlineVisible;
         outline.OutlineColor = Color.yellow;
@@ -26,12 +36,12 @@ public class Interactable : MonoBehaviour, IInteractable
 
     public void OnFocusGained()
     {
-       outline.enabled = true;
+        if (CanInteract()) outline.enabled = true;
     }
 
     public void OnFocusLost()
     {
-       outline.enabled = false;
+        outline.enabled = false;
     }
 
     public Transform Transform => transform;

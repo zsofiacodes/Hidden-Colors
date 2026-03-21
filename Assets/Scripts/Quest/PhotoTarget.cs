@@ -3,7 +3,8 @@ using UnityEngine;
 public class PhotoTarget : MonoBehaviour
 {
     [Header("Objective Settings")]
-    public string objectiveID; // This MUST match the ID in your ObjectiveManager (e.g., "CubeGoal")
+    public string objectiveID;
+    public bool isCaptured = false; // New: Prevents double-capturing
 
     private Renderer targetRenderer;
 
@@ -12,10 +13,10 @@ public class PhotoTarget : MonoBehaviour
         targetRenderer = GetComponent<Renderer>();
     }
 
-    // This function checks if the object is actually inside the camera's view
     public bool IsInView(Camera cam)
     {
-        if (targetRenderer == null) return false;
+        // If already captured, we ignore this object
+        if (isCaptured || targetRenderer == null) return false;
 
         Plane[] planes = GeometryUtility.CalculateFrustumPlanes(cam);
         return GeometryUtility.TestPlanesAABB(planes, targetRenderer.bounds);

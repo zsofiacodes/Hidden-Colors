@@ -7,16 +7,18 @@ using Unity.Cinemachine;
 
 public class PhotoCapture : MonoBehaviour
 {
-    [Header("Photo Taker")]
+    [Header("Photo Taker UI")]
     [SerializeField] private Image photoDisplayArea;
     [SerializeField] private GameObject photoFrame;
     [SerializeField] private GameObject cameraUI;
+    [SerializeField] private GameObject checklistPanel; // NEW: Drag your ChecklistPanel here
 
     [Header("Cameras")]
     [SerializeField] private CinemachineCamera photoPOVCamera;
 
     [Header("Player Settings")]
-    [SerializeField] private MonoBehaviour playerMovementScript; // Drag your Player Movement script here
+    [SerializeField] private MonoBehaviour playerMovementScript;
+    [SerializeField] private GameObject playerMesh;
 
     [Header("Photo Fader Effect")]
     [SerializeField] private Animator fadingAnimation;
@@ -31,6 +33,7 @@ public class PhotoCapture : MonoBehaviour
     private Texture2D screenCapture;
     private bool viewingPhoto;
     private bool isCameraModeActive;
+    private PhotoTarget currentTarget;
 
     private void Start()
     {
@@ -57,16 +60,17 @@ public class PhotoCapture : MonoBehaviour
         }
     }
 
-    public void TakePhotoNow()
+    public void TakePhotoNow(PhotoTarget target)
     {
         if (!isCameraModeActive)
         {
+            currentTarget = target;
             isCameraModeActive = true;
             cameraUI.SetActive(true);
 
+            if (playerMesh != null) playerMesh.SetActive(false);
             if (photoPOVCamera != null) photoPOVCamera.Priority = 20;
 
-            // Lock the cursor and disable player movement
             Cursor.lockState = CursorLockMode.Locked;
             if (playerMovementScript != null) playerMovementScript.enabled = false;
         }
@@ -74,49 +78,43 @@ public class PhotoCapture : MonoBehaviour
 
     private IEnumerator CapturePhotoRoutine()
     {
+        // --- 1. HIDE ALL UI ---
         cameraUI.SetActive(false);
+        if (checklistPanel != null) checklistPanel.SetActive(false);
         viewingPhoto = true;
 
+        // Wait for the end of the frame so the UI is actually gone from the screen
         yield return new WaitForEndOfFrame();
 
+        // --- 2. TAKE THE PHOTO ---
         Rect regionToRead = new Rect(0, 0, Screen.width, Screen.height);
         screenCapture.ReadPixels(regionToRead, 0, 0, false);
         screenCapture.Apply();
 
-        // --- OBJECTIVE SYSTEM LOGIC START ---
-
-        // 1. Find all objects in the scene that have the PhotoTarget script
-        PhotoTarget[] allTargets = Object.FindObjectsByType<PhotoTarget>(FindObjectsSortMode.None);
-
-        foreach (PhotoTarget target in allTargets)
+        if (currentTarget != null)
         {
-            // 2. Check if that specific object is visible to the camera
-            if (target.IsInView(Camera.main))
+            if (currentTarget.IsInView(Camera.main))
             {
-                // 3. Tell the ObjectiveManager to cross it off the list
+                currentTarget.isCaptured = true;
                 if (ObjectiveManager.Instance != null)
                 {
-                    ObjectiveManager.Instance.CheckPhoto(target.objectiveID);
+                    ObjectiveManager.Instance.CheckPhoto(currentTarget.objectiveID);
                 }
             }
+            currentTarget = null;
         }
 
-        // --- OBJECTIVE SYSTEM LOGIC END ---
-
-        // --- BATTERY LOGIC ---
         if (currentBattery > 0)
         {
             currentBattery--;
-            batteryBars[currentBattery].enabled = false; // Hides the top-most bar
+            batteryBars[currentBattery].enabled = false;
         }
 
-        if (currentBattery <= 0)
-        {
-            Debug.Log("Battery Dead! Trigger Ending Cinematic.");
-            // We can add the ending trigger here later!
-        }
-
+        // --- 3. SHOW RESULTS ---
         ShowPhoto();
+        // Bring the checklist back on the main HUD (not in the photo)
+        if (checklistPanel != null) checklistPanel.SetActive(true);
+
         if (cameraAudio != null) cameraAudio.Play();
     }
 
@@ -135,9 +133,9 @@ public class PhotoCapture : MonoBehaviour
         photoFrame.SetActive(false);
         cameraUI.SetActive(false);
 
+        if (playerMesh != null) playerMesh.SetActive(true);
         if (photoPOVCamera != null) photoPOVCamera.Priority = 5;
 
-        // Unlock cursor and re-enable player movement
         Cursor.lockState = CursorLockMode.None;
         if (playerMovementScript != null) playerMovementScript.enabled = true;
     }
