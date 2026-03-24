@@ -1,6 +1,6 @@
-using UnityEngine.SceneManagement;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MusicManager : MonoBehaviour
 {
@@ -14,35 +14,38 @@ public class MusicManager : MonoBehaviour
         if (Instance != null)
         {
             Destroy(gameObject);
+            return;
         }
-        else
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
 
-            // Automatically play ambient music if starting directly in the Game scene
-            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Game")
-            {
-                PlayMusic("Game", 2.0f);
-            }
+    private void OnEnable() { SceneManager.sceneLoaded += OnSceneLoaded; }
+    private void OnDisable() { SceneManager.sceneLoaded -= OnSceneLoaded; }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Automatically start game music when entering the "Game" scene
+        if (scene.name == "Game")
+        {
+            PlayMusic("Game", 2.0f);
         }
     }
 
     public void PlayMusic(string trackName, float fadeDuration = 0.5f)
     {
-        AudioClip clip = musicLibrary.GetClipFromName(trackName);
-        if (clip != null)
+        MusicTrack track = musicLibrary.GetTrackFromName(trackName);
+        if (track.clip != null)
         {
-            StartCoroutine(AnimateMusicCrossfade(clip, fadeDuration));
+            StartCoroutine(AnimateMusicCrossfade(track, fadeDuration));
         }
     }
 
-    IEnumerator AnimateMusicCrossfade(AudioClip nextTrack, float fadeDuration = 0.5f)
+    IEnumerator AnimateMusicCrossfade(MusicTrack nextTrack, float fadeDuration = 0.5f)
     {
         float percent = 0;
         float startVol = musicSource.volume;
 
-        // Fade out current track
         while (percent < 1 && fadeDuration > 0)
         {
             percent += Time.deltaTime * 1 / fadeDuration;
@@ -50,18 +53,18 @@ public class MusicManager : MonoBehaviour
             yield return null;
         }
 
-        musicSource.clip = nextTrack;
+        musicSource.clip = nextTrack.clip;
         musicSource.Play();
 
-        // Fade in new track - capped at 0.4f volume so SFX are audible
         percent = 0;
         while (percent < 1 && fadeDuration > 0)
         {
             percent += Time.deltaTime * 1 / fadeDuration;
-            musicSource.volume = Mathf.Lerp(0, 0.4f, percent);
+            // Fades to the specific volume set for this track in the Library
+            musicSource.volume = Mathf.Lerp(0, nextTrack.volume, percent);
             yield return null;
         }
-        if (fadeDuration <= 0) musicSource.volume = 0.4f;
+        if (fadeDuration <= 0) musicSource.volume = nextTrack.volume;
     }
 
     public void StopMusic(float fadeDuration = 1.0f)
@@ -79,25 +82,6 @@ public class MusicManager : MonoBehaviour
             musicSource.volume = Mathf.Lerp(startVolume, 0, percent);
             yield return null;
         }
-        musicSource.volume = 0;
         musicSource.Stop();
-    }
-    private void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        // Check if the scene we just entered is your gameplay scene
-        if (scene.name == "Game") // <--- Make sure this matches your scene name!
-        {
-            PlayMusic("Game", 2.0f); // <--- Make sure "Game" is in your MusicLibrary
-        }
     }
 }

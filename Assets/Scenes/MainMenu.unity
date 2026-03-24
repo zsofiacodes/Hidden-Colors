@@ -2775,6 +2775,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2897332477091024953, guid: d8a6b4c399d14a344a60082840f2ff95, type: 3}
+      propertyPath: tracks.Array.data[0].volume
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2897332477091024953, guid: d8a6b4c399d14a344a60082840f2ff95, type: 3}
+      propertyPath: tracks.Array.data[1].volume
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2897332477091024953, guid: d8a6b4c399d14a344a60082840f2ff95, type: 3}
+      propertyPath: tracks.Array.data[2].volume
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 2897332477091024953, guid: d8a6b4c399d14a344a60082840f2ff95, type: 3}
       propertyPath: tracks.Array.data[2].trackName
       value: Intro
       objectReference: {fileID: 0}
