@@ -11,7 +11,7 @@ public class PhotoCapture : MonoBehaviour
     [SerializeField] private Image photoDisplayArea;
     [SerializeField] private GameObject photoFrame;
     [SerializeField] private GameObject cameraUI;
-    [SerializeField] private GameObject checklistPanel; // NEW: Drag your ChecklistPanel here
+    [SerializeField] private GameObject checklistPanel;
 
     [Header("Cameras")]
     [SerializeField] private CinemachineCamera photoPOVCamera;
@@ -26,10 +26,6 @@ public class PhotoCapture : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private AudioSource cameraAudio;
 
-    [Header("Battery UI")]
-    [SerializeField] private List<Image> batteryBars;
-    private int currentBattery;
-
     private Texture2D screenCapture;
     private bool viewingPhoto;
     private bool isCameraModeActive;
@@ -37,16 +33,21 @@ public class PhotoCapture : MonoBehaviour
 
     private void Start()
     {
+        // Initialize the texture for capturing the screen
         screenCapture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+
+        // Ensure UI is hidden at start
         cameraUI.SetActive(false);
         photoFrame.SetActive(false);
 
         if (photoPOVCamera != null) photoPOVCamera.Priority = 5;
-        currentBattery = batteryBars.Count;
     }
 
     private void Update()
     {
+        // Connection: Check with Boss if we are allowed to use the camera
+        if (GameManager.Instance != null && GameManager.Instance.currentState != GameState.Imagination) return;
+
         if (isCameraModeActive && Keyboard.current.cKey.wasPressedThisFrame)
         {
             if (!viewingPhoto)
@@ -60,6 +61,7 @@ public class PhotoCapture : MonoBehaviour
         }
     }
 
+    // Called by PhotoTarget when player presses E
     public void TakePhotoNow(PhotoTarget target)
     {
         if (!isCameraModeActive)
@@ -78,19 +80,17 @@ public class PhotoCapture : MonoBehaviour
 
     private IEnumerator CapturePhotoRoutine()
     {
-        // --- 1. HIDE ALL UI ---
         cameraUI.SetActive(false);
         if (checklistPanel != null) checklistPanel.SetActive(false);
         viewingPhoto = true;
 
-        // Wait for the end of the frame so the UI is actually gone from the screen
         yield return new WaitForEndOfFrame();
 
-        // --- 2. TAKE THE PHOTO ---
         Rect regionToRead = new Rect(0, 0, Screen.width, Screen.height);
         screenCapture.ReadPixels(regionToRead, 0, 0, false);
         screenCapture.Apply();
 
+        // Check if the object we are looking at is a valid objective
         if (currentTarget != null)
         {
             if (currentTarget.IsInView(Camera.main))
@@ -104,17 +104,15 @@ public class PhotoCapture : MonoBehaviour
             currentTarget = null;
         }
 
-        if (currentBattery > 0)
+        // Connection: Tell the Boss to use one battery segment
+        if (GameManager.Instance != null)
         {
-            currentBattery--;
-            batteryBars[currentBattery].enabled = false;
+            GameManager.Instance.UseBattery();
         }
 
-        // --- 3. SHOW RESULTS ---
         ShowPhoto();
-        // Bring the checklist back on the main HUD (not in the photo)
-        if (checklistPanel != null) checklistPanel.SetActive(true);
 
+        if (checklistPanel != null) checklistPanel.SetActive(true);
         if (cameraAudio != null) cameraAudio.Play();
     }
 
@@ -136,7 +134,7 @@ public class PhotoCapture : MonoBehaviour
         if (playerMesh != null) playerMesh.SetActive(true);
         if (photoPOVCamera != null) photoPOVCamera.Priority = 5;
 
-        Cursor.lockState = CursorLockMode.None;
+        Cursor.lockState = CursorLockMode.Locked;
         if (playerMovementScript != null) playerMovementScript.enabled = true;
     }
 }

@@ -1,48 +1,30 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Interactable : MonoBehaviour, IInteractable
+public class Interactable : MonoBehaviour
 {
-    [SerializeField] private string displayName = "Interact";
-    [SerializeField] private bool isEnabled = true;
-    [SerializeField] private UnityEvent onInteract;
+    public UnityEvent onInteract;
+    private MonoBehaviour outline; // Using MonoBehaviour to be extra safe
 
-    private PhotoTarget photoTarget; // Reference to our target script
-    private Outline outline;
-
-    public string DisplayName => displayName;
-
-    // This now checks if the object was already photographed!
-    public bool CanInteract()
+    void Start()
     {
-        if (photoTarget != null && photoTarget.isCaptured) return false;
-        return isEnabled;
+        // Try to find an Outline script, but don't crash if it's missing
+        outline = GetComponent("Outline") as MonoBehaviour;
+        if (outline != null) outline.enabled = false;
     }
 
-    private void Awake()
+    public void OnGainFocus()
     {
-        photoTarget = GetComponent<PhotoTarget>();
-        outline = gameObject.AddComponent<Outline>();
-        outline.OutlineMode = Outline.Mode.OutlineVisible;
-        outline.OutlineColor = Color.yellow;
-        outline.OutlineWidth = 3f;
-        outline.enabled = false;
+        if (outline != null) outline.enabled = true;
+    }
+
+    public void OnLoseFocus()
+    {
+        if (outline != null) outline.enabled = false;
     }
 
     public void Interact()
     {
         onInteract?.Invoke();
     }
-
-    public void OnFocusGained()
-    {
-        if (CanInteract()) outline.enabled = true;
-    }
-
-    public void OnFocusLost()
-    {
-        outline.enabled = false;
-    }
-
-    public Transform Transform => transform;
 }

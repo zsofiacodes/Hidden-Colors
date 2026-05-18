@@ -51,6 +51,7 @@ public class ThirdPersonController : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.Instance != null && GameManager.Instance.currentState != GameState.Imagination) return;
         GroundCheck();
     }
 
@@ -62,6 +63,7 @@ public class ThirdPersonController : MonoBehaviour
     private void FixedUpdate()
     {
         Move();
+        if (GameManager.Instance != null && GameManager.Instance.currentState != GameState.Imagination) return;
     }
 
     private void Move()

@@ -1,66 +1,89 @@
-using Unity.Collections;
 using UnityEngine;
-// 1. Add this namespace to access the new Input System
 using UnityEngine.InputSystem;
 
 public class PlayerInteractor : MonoBehaviour
 {
-    [SerializeField] private float radius = 2f;
+    [Header("Detection Settings")]
+    [SerializeField] private float interactRange = 5f;
     [SerializeField] private LayerMask interactableLayer;
-    [SerializeField] private InteractPrompt prompt;
 
-    private Collider[] buffer = new Collider[32];
-    private IInteractable focused;
+    [Header("RayStarting point")]
+    [SerializeField] private Transform rayStartPoint;
+
+    [Header("UI Reference")]
+    [SerializeField] private GameObject interactPrompt;
+
+    private Interactable focusedInteractable;
+
+    private void Start()
+    {
+        interactPrompt.SetActive(false);
+    }
 
     private void Update()
     {
-        IInteractable nearest = FindNearestInteractable();
-        UpdateFocus(nearest);
-
-        // 2. Updated the input check to use the Keyboard class
-        // This checks if the 'E' key was pressed this frame
-        if (focused != null && Keyboard.current.eKey.wasPressedThisFrame)
-        {
-            if (focused.CanInteract()) focused.Interact();
-        }
+        CheckForInteractable();
     }
 
-    private IInteractable FindNearestInteractable()
+    public void ShowPrompt(bool value)
     {
-        int count = Physics.OverlapSphereNonAlloc(transform.position, radius, buffer, interactableLayer, QueryTriggerInteraction.Collide);
-        IInteractable nearest = null;
-        float bestDistSq = float.MaxValue;
+        interactPrompt.SetActive(value);
+    }
 
-        for (int i = 0; i < count; i++)
+    private void CheckForInteractable()
+    {
+        // Start ray from camera, nudged forward 0.1 to avoid player body
+        Vector3 rayStart = rayStartPoint.position + (rayStartPoint.forward * 0.1f);
+        Ray ray = new Ray(rayStart, rayStartPoint.forward);
+        Debug.DrawRay(rayStart, rayStartPoint.forward * interactRange, Color.red);
+
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, interactRange, interactableLayer))
         {
-            Collider col = buffer[i];
-            if (col == null) continue;
-            IInteractable interactable = col.GetComponentInParent<IInteractable>();
-            if (interactable == null) continue;
-            if (!interactable.CanInteract()) continue;
-            float distSq = (col.transform.position - transform.position).sqrMagnitude;
-            if (distSq < bestDistSq)
+            Interactable target = hit.collider.GetComponent<Interactable>();
+
+            if (target != null)
             {
-                bestDistSq = distSq;
-                nearest = interactable;
+                ShowPrompt(true);
+
+                if (target != focusedInteractable)
+                {
+                    if (focusedInteractable != null) focusedInteractable.OnLoseFocus();
+                    focusedInteractable = target;
+                    focusedInteractable.OnGainFocus();
+                }
+                
+                return;
+            }
+            else
+            {
+                ShowPrompt(false);
             }
         }
-        return nearest;
+
+        // If we hit nothing, clean up
+        if (focusedInteractable != null)
+        {
+            focusedInteractable.OnLoseFocus();
+            focusedInteractable = null;
+        }
+
+        if (interactPrompt.activeSelf)
+        {
+            interactPrompt.SetActive(false);
+        }
     }
 
-    private void UpdateFocus(IInteractable nearest)
+    public void OnInteract(InputValue value)
     {
-        if (ReferenceEquals(focused, nearest)) return;
-        focused?.OnFocusLost();
-        focused = nearest;
-        if (focused != null)
+        if (value.isPressed && focusedInteractable != null)
         {
-            focused.OnFocusGained();
-            prompt.Show(focused);
-        }
-        else
-        {
-            prompt.Hide();
+            Debug.Log("Interacting with: " + focusedInteractable.gameObject.name);
+            focusedInteractable.Interact();
+
+            // Clear focus immediately after interaction to prevent errors
+            if (interactPrompt != null) interactPrompt.SetActive(false);
+            focusedInteractable = null;
         }
     }
 }
