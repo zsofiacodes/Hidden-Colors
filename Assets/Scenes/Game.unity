@@ -269,6 +269,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 100990653}
   m_CullTransparentMesh: 1
+--- !u!1 &126133952
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 126133954}
+  - component: {fileID: 126133953}
+  m_Layer: 0
+  m_Name: Objective Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &126133953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 126133952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9d0242fd2d38a548ba3910d11abfc2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectiveManager
+  allObjectives:
+  - {fileID: 1356308252}
+  - {fileID: 1425492341}
+  - {fileID: 1459346869}
+  - {fileID: 1600019086}
+  - {fileID: 1996047944}
+--- !u!4 &126133954
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 126133952}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.80399, y: 4.91694, z: -1.15825}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &260891291
 GameObject:
   m_ObjectHideFlags: 0
@@ -1891,9 +1941,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b443d4b4a0a65043b57709503edba01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InteractPrompt
-  label: {fileID: 588313995}
-  worldOffset: {x: 0, y: 1, z: 0}
-  keyHint: '[E] '
 --- !u!1 &893902777
 GameObject:
   m_ObjectHideFlags: 0
@@ -3279,8 +3326,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ce0975c21bbf1f4a81fc151484d7099, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhotoTarget
-  objectiveID: Test 1
-  isCaptured: 0
+  objectiveID: 0
+  IsCompleted: 0
 --- !u!114 &1356308253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3678,7 +3725,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   rayStartPoint: {fileID: 421426511}
-  interactPrompt: {fileID: 1822004281}
 --- !u!1 &1413463755
 GameObject:
   m_ObjectHideFlags: 0
@@ -3889,8 +3935,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ce0975c21bbf1f4a81fc151484d7099, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhotoTarget
-  objectiveID: Test 2
-  isCaptured: 0
+  objectiveID: 1
+  IsCompleted: 0
 --- !u!65 &1425492342
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4076,8 +4122,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ce0975c21bbf1f4a81fc151484d7099, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhotoTarget
-  objectiveID: Test 3
-  isCaptured: 0
+  objectiveID: 2
+  IsCompleted: 0
 --- !u!65 &1459346870
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4385,8 +4431,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ce0975c21bbf1f4a81fc151484d7099, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhotoTarget
-  objectiveID: Test 4
-  isCaptured: 0
+  objectiveID: 3
+  IsCompleted: 0
 --- !u!65 &1600019087
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4489,10 +4535,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1660888067}
-  - component: {fileID: 1660888066}
   - component: {fileID: 1660888068}
+  - component: {fileID: 1660888066}
   m_Layer: 0
-  m_Name: Camera - Manager
+  m_Name: Camera Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4513,10 +4559,7 @@ MonoBehaviour:
   photoDisplayArea: {fileID: 1996682507}
   photoFrame: {fileID: 1506139445}
   cameraUI: {fileID: 1664854841}
-  checklistPanel: {fileID: 1413463755}
-  photoPOVCamera: {fileID: 1335187706}
-  playerMovementScript: {fileID: 1411093498}
-  playerMesh: {fileID: 1728894043}
+  batteryUIBars: []
   fadingAnimation: {fileID: 1996682510}
   cameraAudio: {fileID: 1286856374}
 --- !u!4 &1660888067
@@ -4543,30 +4586,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1660888065}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9d0242fd2d38a548ba3910d11abfc2a, type: 3}
+  m_Script: {fileID: 11500000, guid: 1ad6280d79daf574db403d07d1181342, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObjectiveManager
-  objectives:
-  - id: Test 1
-    description: "\u2022 photo one"
-    uiText: {fileID: 1172196973}
-    completed: 0
-  - id: Test 2
-    description: "\u2022 photo two"
-    uiText: {fileID: 1324349980}
-    completed: 0
-  - id: Test 3
-    description: "\u2022 photo three"
-    uiText: {fileID: 355895570}
-    completed: 0
-  - id: Test 4
-    description: "\u2022 photo four"
-    uiText: {fileID: 833886357}
-    completed: 0
-  - id: Test 5
-    description: "\u2022 photo five"
-    uiText: {fileID: 893902778}
-    completed: 0
+  m_EditorClassIdentifier: Assembly-CSharp::CameraManager
+  cameraUI: {fileID: 1660888066}
+  photoPOVCamera: {fileID: 573797596}
+  playerMesh: {fileID: 1411093495}
 --- !u!1 &1664854841
 GameObject:
   m_ObjectHideFlags: 0
@@ -5161,8 +5186,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ce0975c21bbf1f4a81fc151484d7099, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhotoTarget
-  objectiveID: Test 5
-  isCaptured: 0
+  objectiveID: 4
+  IsCompleted: 0
 --- !u!65 &1996047945
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5590,7 +5615,7 @@ GameObject:
   - component: {fileID: 2121443277}
   - component: {fileID: 2121443276}
   m_Layer: 0
-  m_Name: _Managers
+  m_Name: Game Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5609,9 +5634,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   currentState: 0
-  tutorialUI: {fileID: 1167402586}
-  photosLeft: 5
-  batteryUIBars: []
+  cameraManager: {fileID: 0}
+  objectiveManager: {fileID: 0}
 --- !u!4 &2121443277
 Transform:
   m_ObjectHideFlags: 0
@@ -5631,13 +5655,16 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 2121443277}
+  - {fileID: 1660888067}
+  - {fileID: 126133954}
   - {fileID: 330585546}
   - {fileID: 1696421007}
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 1411093496}
-  - {fileID: 1399353227}
   - {fileID: 573797597}
+  - {fileID: 1399353227}
   - {fileID: 1356308250}
   - {fileID: 1425492346}
   - {fileID: 1459346874}
@@ -5645,6 +5672,4 @@ SceneRoots:
   - {fileID: 1996047949}
   - {fileID: 1822004285}
   - {fileID: 1516981583}
-  - {fileID: 1660888067}
   - {fileID: 1286856375}
-  - {fileID: 2121443277}

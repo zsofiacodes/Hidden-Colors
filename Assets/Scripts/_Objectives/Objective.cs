@@ -1,11 +1,9 @@
 using UnityEngine;
 
-public class PhotoTarget : MonoBehaviour
+public class Objective : MonoBehaviour, IObjective
 {
-    [Header("Objective Settings")]
-    public string objectiveID;
-    public bool isCaptured = false;
-
+    public int objectiveID;
+    public bool IsCompleted = false;
     private Renderer targetRenderer;
 
     private void Start()
@@ -16,16 +14,23 @@ public class PhotoTarget : MonoBehaviour
     // This is the function called by the PlayerInteractor script
     public void Interact()
     {
-        PhotoCapture pc = FindFirstObjectByType<PhotoCapture>();
-        if (pc != null && !isCaptured)
-        {
-            pc.TakePhotoNow(this);
-        }
+        
+    }
+
+    public void Capture()
+    {
+        IsCompleted = true;
+        ObjectiveManager.Instance.CompleteObjective(this, objectiveID);
+    }
+
+    public void Complete()
+    {
+        IsCompleted = true;
     }
 
     public bool IsInView(Camera cam)
     {
-        if (isCaptured || targetRenderer == null) return false;
+        if (IsCompleted || targetRenderer == null) return false;
 
         Plane[] planes = GeometryUtility.CalculateFrustumPlanes(cam);
         return GeometryUtility.TestPlanesAABB(planes, targetRenderer.bounds);

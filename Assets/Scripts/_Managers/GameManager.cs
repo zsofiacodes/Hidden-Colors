@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 
-public enum GameState { Tutorial, Imagination, Transition, Reality }
+public enum GameState { Tutorial, Free, TakingPicture, Outro}
 
 public class GameManager : MonoBehaviour
 {
@@ -8,11 +9,10 @@ public class GameManager : MonoBehaviour
     public GameState currentState;
 
     [Header("References")]
-    public GameObject tutorialUI;
+    [SerializeField] private CameraManager cameraManager;
+    [SerializeField] private ObjectiveManager objectiveManager;
 
-    [Header("Battery Settings")]
-    public int photosLeft = 5;
-    public GameObject[] batteryUIBars; // Drag your 5 bars here (0 to 4)
+    public event Action<GameState> stateChange;
 
     private void Awake()
     {
@@ -34,43 +34,23 @@ public class GameManager : MonoBehaviour
                 Time.timeScale = 0f;
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
-                if (tutorialUI != null) tutorialUI.SetActive(true);
                 break;
 
-            case GameState.Imagination:
+            case GameState.Free:
                 Time.timeScale = 1f;
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
-                if (tutorialUI != null) tutorialUI.SetActive(false);
                 break;
 
-            case GameState.Transition:
-                // This triggers the moment the 5th photo is snapped
-                SetState(GameState.Reality);
+            case GameState.TakingPicture:
+               
                 break;
 
-            case GameState.Reality:
+            case GameState.Outro:
                 Debug.Log("Switching to Reality Mode...");
-                // We will put the code to turn off the happy filter here next!
                 break;
         }
-    }
 
-    public void UseBattery()
-    {
-        if (photosLeft > 0)
-        {
-            photosLeft--;
-            // Hides the bars one by one
-            if (photosLeft < batteryUIBars.Length && batteryUIBars[photosLeft] != null)
-            {
-                batteryUIBars[photosLeft].SetActive(false);
-            }
-        }
-
-        if (photosLeft <= 0)
-        {
-            SetState(GameState.Transition);
-        }
+        stateChange.Invoke(currentState);
     }
 }

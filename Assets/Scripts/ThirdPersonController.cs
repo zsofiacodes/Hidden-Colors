@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class ThirdPersonController : MonoBehaviour
 {
@@ -51,7 +50,7 @@ public class ThirdPersonController : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance != null && GameManager.Instance.currentState != GameState.Imagination) return;
+        if (GameManager.Instance.currentState != GameState.Free) return;
         GroundCheck();
     }
 
@@ -63,7 +62,7 @@ public class ThirdPersonController : MonoBehaviour
     private void FixedUpdate()
     {
         Move();
-        if (GameManager.Instance != null && GameManager.Instance.currentState != GameState.Imagination) return;
+        if (GameManager.Instance.currentState != GameState.Free) return;
     }
 
     private void Move()
@@ -140,9 +139,4 @@ public class ThirdPersonController : MonoBehaviour
         isGrounded = Physics.CheckSphere(groundCheckPoint.position, groundCheckRadius, groundLayer);
         animator.SetBool(groundedParamName, isGrounded);
     }
-
-    private void OnMove(InputValue inputValue) => move = inputValue.Get<Vector2>();
-    private void OnJump() => Jump();
-    private void OnRun(InputValue inputValue) => isRunning = inputValue.isPressed;
-    private void OnLook(InputValue inputValue) => look = inputValue.Get<Vector2>();
 }
