@@ -3652,20 +3652,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1defa8e9b00379144833ba6b4c7e2901, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ThirdPersonController
-  cameraTarget: {fileID: 353818437}
-  topClamp: 70
-  bottomClamp: -30
-  movementSpeed: 3
-  lookSpeed: 10
+  walkSpeed: 3
+  runSpeed: 6
+  lookSensitivity: 0.1
   jumpStrength: 7
-  jumpDowntime: 1
-  groundCheckPoint: {fileID: 958874928}
-  groundCheckRadius: 0.1
+  groundCheck: {fileID: 958874928}
+  groundRadius: 0.2
   groundLayer:
     serializedVersion: 2
     m_Bits: 1
+  cameraTarget: {fileID: 353818437}
   animator: {fileID: 1728894044}
-  body: {fileID: 1411093501}
 --- !u!54 &1411093501
 Rigidbody:
   m_ObjectHideFlags: 0

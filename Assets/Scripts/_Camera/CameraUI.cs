@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.Cinemachine;
 
 public class CameraUI : MonoBehaviour
 {
