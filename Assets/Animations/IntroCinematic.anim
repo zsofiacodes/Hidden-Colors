@@ -1310,28 +1310,28 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0
-    functionName: PlayLaugh
+    functionName: PlayLaughEvent
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 2.9
-    functionName: PlayFall
+    functionName: PlayFallEvent
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 18.8
-    functionName: StartGame
+    functionName: CinematicHasEnded
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 18.8
-    functionName: StopAllMusic
+    functionName: CinematicHasEnded
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

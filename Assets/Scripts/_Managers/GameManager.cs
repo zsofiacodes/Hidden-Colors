@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public enum GameState { Tutorial, Free, TakingPicture, Outro}
+public enum GameState { MainMenu, IntroCinematic, Tutorial, Free, TakingPicture, Outro}
 
 public class GameManager : MonoBehaviour
 {
@@ -16,12 +16,17 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null)
+        {
+            Destroy(gameObject); return;
+        }
         Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
     {
-        SetState(GameState.Tutorial);
+        SetState(GameState.MainMenu);
     }
 
     public void SetState(GameState newState)
@@ -31,15 +36,15 @@ public class GameManager : MonoBehaviour
         switch (currentState)
         {
             case GameState.Tutorial:
-                Time.timeScale = 0f;
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
                 break;
 
             case GameState.Free:
-                Time.timeScale = 1f;
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
+
+                FindReferences();
                 break;
 
             case GameState.TakingPicture:
@@ -51,6 +56,19 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        stateChange.Invoke(currentState);
+        stateChange?.Invoke(currentState);
+    }
+
+    public void FindReferences()
+    {
+        if (cameraManager == null)
+        {
+            cameraManager = FindFirstObjectByType<CameraManager>();
+        }
+
+        if (objectiveManager == null)
+        {
+            objectiveManager = FindFirstObjectByType<ObjectiveManager>();
+        }
     }
 }
