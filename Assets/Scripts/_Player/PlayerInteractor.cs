@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerInteractor : MonoBehaviour
@@ -8,6 +9,8 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] private Transform rayStartPoint;
 
     private Interactable focusedInteractable;
+
+    public Action OnWithinInteractRange;
 
     private void Update()
     {
@@ -29,6 +32,7 @@ public class PlayerInteractor : MonoBehaviour
                     if (focusedInteractable != null) focusedInteractable.OnLoseFocus();
                     focusedInteractable = target;
                     focusedInteractable.OnGainFocus();
+                    OnWithinInteractRange?.Invoke();
                 }
 
                 return;

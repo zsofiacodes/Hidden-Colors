@@ -2168,6 +2168,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 851431788}
+  - component: {fileID: 851431789}
+  - component: {fileID: 851431790}
   m_Layer: 5
   m_Name: InteractPrompt
   m_TagString: Untagged
@@ -2195,6 +2197,32 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1920, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &851431789
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 851431787}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
+--- !u!114 &851431790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 851431787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81a7dfb3a9940034e8680fd0981664aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractIndicator
+  indicatorCanvasGroup: {fileID: 851431789}
+  playerInteractor: {fileID: 1411093502}
 --- !u!1 &865633479
 GameObject:
   m_ObjectHideFlags: 0
@@ -2482,6 +2510,7 @@ GameObject:
   m_Component:
   - component: {fileID: 982158499}
   - component: {fileID: 982158500}
+  - component: {fileID: 982158501}
   m_Layer: 5
   m_Name: Battery cells
   m_TagString: Untagged
@@ -2540,6 +2569,25 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &982158501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 982158498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e7effc819cf2e94b807d32998f978ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraBatteryUI
+  batterySprites:
+  - {fileID: 1802314481}
+  - {fileID: 1417948572}
+  - {fileID: 1943884166}
+  - {fileID: 681518375}
+  - {fileID: 1087365927}
+  cameraManager: {fileID: 1660888068}
 --- !u!1 &1061698660
 GameObject:
   m_ObjectHideFlags: 0
@@ -3356,6 +3404,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 682763f349901934e8d3fa979b239ed1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Interactable
+  outline: {fileID: 1356308254}
   onInteract:
     m_PersistentCalls:
       m_Calls:
@@ -3590,6 +3639,7 @@ GameObject:
   - component: {fileID: 1411093501}
   - component: {fileID: 1411093500}
   - component: {fileID: 1411093502}
+  - component: {fileID: 1411093503}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -3707,6 +3757,36 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   rayStartPoint: {fileID: 421426511}
+--- !u!114 &1411093503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1411093495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
+  m_Actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: 
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &1417948569
 GameObject:
   m_ObjectHideFlags: 0
@@ -3816,6 +3896,8 @@ GameObject:
   - component: {fileID: 1425492343}
   - component: {fileID: 1425492342}
   - component: {fileID: 1425492341}
+  - component: {fileID: 1425492348}
+  - component: {fileID: 1425492347}
   m_Layer: 6
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -3930,6 +4012,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 194535351}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1425492347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1425492340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 0.8301887, g: 0.7798019, b: 0.34069067, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
+--- !u!114 &1425492348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1425492340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 682763f349901934e8d3fa979b239ed1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Interactable
+  outline: {fileID: 1425492347}
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1425492341}
+        m_TargetAssemblyTypeName: Objective, Assembly-CSharp
+        m_MethodName: Interact
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1001 &1458929609
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4003,6 +4131,8 @@ GameObject:
   - component: {fileID: 1459346871}
   - component: {fileID: 1459346870}
   - component: {fileID: 1459346869}
+  - component: {fileID: 1459346876}
+  - component: {fileID: 1459346875}
   m_Layer: 6
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -4117,6 +4247,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 194535351}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1459346875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1459346868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 0.8301887, g: 0.7798019, b: 0.34069067, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
+--- !u!114 &1459346876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1459346868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 682763f349901934e8d3fa979b239ed1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Interactable
+  outline: {fileID: 1459346875}
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1459346869}
+        m_TargetAssemblyTypeName: Objective, Assembly-CSharp
+        m_MethodName: Interact
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1496494691
 GameObject:
   m_ObjectHideFlags: 0
@@ -4265,8 +4441,9 @@ GameObject:
   - component: {fileID: 1506139448}
   - component: {fileID: 1506139447}
   - component: {fileID: 1506139446}
+  - component: {fileID: 1506139449}
   m_Layer: 5
-  m_Name: PhotoFrameBG
+  m_Name: PhotoFrame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4330,6 +4507,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1280, y: 730}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &1506139449
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1506139445}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &1516981582
 GameObject:
   m_ObjectHideFlags: 0
@@ -4447,6 +4636,8 @@ GameObject:
   - component: {fileID: 1600019088}
   - component: {fileID: 1600019087}
   - component: {fileID: 1600019086}
+  - component: {fileID: 1600019093}
+  - component: {fileID: 1600019092}
   m_Layer: 6
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -4561,6 +4752,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 194535351}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1600019092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1600019085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 0.8301887, g: 0.7798019, b: 0.34069067, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
+--- !u!114 &1600019093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1600019085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 682763f349901934e8d3fa979b239ed1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Interactable
+  outline: {fileID: 1600019092}
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1600019086}
+        m_TargetAssemblyTypeName: Objective, Assembly-CSharp
+        m_MethodName: Interact
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1660888065
 GameObject:
   m_ObjectHideFlags: 0
@@ -4591,8 +4828,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79bd46b3fa0ab6b478b3f20c91e921a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhotoCapture
-  photoDisplayArea: {fileID: 1996682507}
-  photoFrame: {fileID: 1506139445}
+  photoDisplayTexture: {fileID: 2081215892}
+  photoframe: {fileID: 1506139445}
+  photoFrameCanvasGroup: {fileID: 1506139449}
   cameraUI: {fileID: 1664854841}
   batteryUIBars:
   - {fileID: 1802314478}
@@ -4630,8 +4868,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraManager
   cameraUI: {fileID: 1660888066}
-  photoPOVCamera: {fileID: 573797596}
-  playerMesh: {fileID: 1411093495}
+  photoPOVCamera: {fileID: 1335187706}
+  playerMesh: {fileID: 1728894043}
 --- !u!1 &1664854841
 GameObject:
   m_ObjectHideFlags: 0
@@ -5311,6 +5549,8 @@ GameObject:
   - component: {fileID: 1996047946}
   - component: {fileID: 1996047945}
   - component: {fileID: 1996047944}
+  - component: {fileID: 1996047951}
+  - component: {fileID: 1996047950}
   m_Layer: 6
   m_Name: Cube (4)
   m_TagString: Untagged
@@ -5425,6 +5665,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 194535351}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1996047950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1996047943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 0.8301887, g: 0.7798019, b: 0.34069067, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
+--- !u!114 &1996047951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1996047943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 682763f349901934e8d3fa979b239ed1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Interactable
+  outline: {fileID: 1996047950}
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1996047944}
+        m_TargetAssemblyTypeName: Objective, Assembly-CSharp
+        m_MethodName: Interact
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1996682506
 GameObject:
   m_ObjectHideFlags: 0
@@ -5439,7 +5725,7 @@ GameObject:
   - component: {fileID: 1996682511}
   - component: {fileID: 1996682510}
   m_Layer: 5
-  m_Name: PhotoDisplayArea
+  m_Name: PhotoDisplayEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5718,7 +6004,7 @@ GameObject:
   - component: {fileID: 2081215893}
   - component: {fileID: 2081215892}
   m_Layer: 5
-  m_Name: PhotoDisplayAreaBG
+  m_Name: PhotoDisplayTexture
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

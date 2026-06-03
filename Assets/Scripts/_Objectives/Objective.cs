@@ -11,14 +11,14 @@ public class Objective : MonoBehaviour, IObjective
         targetRenderer = GetComponent<Renderer>();
     }
 
-    // This is the function called by the PlayerInteractor script
     public void Interact()
     {
-        
+        //When the user presses E, then you do this (bring camera up)
     }
 
     public void Capture()
     {
+        //When the user presses C, then you do this (make the picture)
         IsCompleted = true;
         ObjectiveManager.Instance.CompleteObjective(this, objectiveID);
     }

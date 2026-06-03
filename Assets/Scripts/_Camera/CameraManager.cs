@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
+using System.IO;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class CameraManager : MonoBehaviour
 {
@@ -15,11 +17,20 @@ public class CameraManager : MonoBehaviour
     public event Action OnPhotoTaken;
 
     private int photosLeft = 5;
-    private Texture2D screenCapture;
+    private Sprite screenCapture;
     private Objective currentTarget;
     
     private bool isCameraModeActive = false;
     private bool viewingPhoto;
+
+    private void Awake()
+    {
+        screenCapture = Sprite.Create(
+            new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false),
+            new Rect(0, 0, Screen.width, Screen.height),
+            new Vector2(0.5f, 0.5f)
+        );
+    }
 
     private void Start()
     {
@@ -32,23 +43,18 @@ public class CameraManager : MonoBehaviour
         {
             if (Keyboard.current.eKey.wasPressedThisFrame)
             {
-                if (!isCameraModeActive) return;
+                if (!isCameraModeActive)
+                    EnterCameraMode();
 
-                EnterCameraMode();
+                else
+                    ExitCameraMode();
             }
 
             if (Keyboard.current.cKey.wasPressedThisFrame)
             {
                 if (!isCameraModeActive) return;
-
-                if (!viewingPhoto)
-                {
-                    EnterCameraMode();
-                }
-                else
-                {
-                    TakeSnapShot();
-                }
+                
+                StartCoroutine(TakeSnapShot());
             }
         }
     }
@@ -56,16 +62,45 @@ public class CameraManager : MonoBehaviour
 
     private void EnterCameraMode()
     {
+        photoPOVCamera.Priority = 20;
+        isCameraModeActive = true;
+        playerMesh.SetActive(false);
         cameraUI.ShowCameraUI(true);
+
+        GameManager.Instance.SetState(GameState.TakingPicture);
     }
 
-    private void TakeSnapShot()
+    private void ExitCameraMode()
     {
-        UseBattery();
+        photoPOVCamera.Priority = 5;
+        isCameraModeActive = false;
+        playerMesh.SetActive(true);
+        cameraUI.ShowCameraUI(false);
 
-        Rect regionToRead = new Rect(0, 0, Screen.width, Screen.height);
-        screenCapture.ReadPixels(regionToRead, 0, 0, false);
-        screenCapture.Apply();
+        GameManager.Instance.SetState(GameState.Free);
+    }
+
+    private IEnumerator TakeSnapShot()
+    {
+        yield return new WaitForEndOfFrame();
+
+        Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+        texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+        texture.Apply();
+
+        Sprite screenshotSprite = Sprite.Create(
+            texture,
+            new Rect(0, 0, texture.width, texture.height),
+            new Vector2(0.5f, 0.5f)
+        );
+
+        screenCapture = screenshotSprite;
+
+        byte[] bytes = texture.EncodeToPNG();
+        string path = Path.Combine(Application.persistentDataPath, "CustomScreenshot.png");
+        File.WriteAllBytes(path, bytes);
+
+        //Destroy(texture);
 
         // Check if the object we are looking at is a valid objective
         if (currentTarget != null)
@@ -88,19 +123,6 @@ public class CameraManager : MonoBehaviour
         ShowPhoto();
     }
 
-    private void ExitCameraMode()
-    {
-        viewingPhoto = false;
-        isCameraModeActive = false;
-
-        playerMesh.SetActive(true);
-        photoPOVCamera.Priority = 5;
-
-        cameraUI.ShowCameraUI(false);
-
-        GameManager.Instance.SetState(GameState.Free);
-    }
-
     public void UseBattery()
     {
         if (photosLeft > 0)
@@ -117,17 +139,6 @@ public class CameraManager : MonoBehaviour
 
     private void ShowPhoto()
     {
-        //Button or after sometime?
-
-        cameraUI.ShowCameraUI(true);
-
-
-        //Sprite photoSprite = Sprite.Create(screenCapture, new Rect(0.0f, 0.0f, screenCapture.width, screenCapture.height), new Vector2(0.5f, 0.5f), 100.0f);
-
-        //cameraUI.ReceiveTakenPicture(photoSprite.texture);
-        //photoDisplayArea.sprite = photoSprite;
-
-        //cameraUI.ShowPhotoFrame(true);
-        //photoFrame.SetActive(true);
+        cameraUI.ReceiveTakenPicture(screenCapture);
     }
 }

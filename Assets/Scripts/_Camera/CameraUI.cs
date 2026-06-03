@@ -1,11 +1,13 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CameraUI : MonoBehaviour
 {
     [Header("Photo Taker UI")]
-    [SerializeField] private Image photoDisplayArea;
-    [SerializeField] private GameObject photoFrame;
+    [SerializeField] private Image photoDisplayTexture;
+    [SerializeField] private GameObject photoframe;
+    [SerializeField] private CanvasGroup photoFrameCanvasGroup;
     [SerializeField] private GameObject cameraUI;
     [SerializeField] private GameObject[] batteryUIBars;
 
@@ -30,11 +32,24 @@ public class CameraUI : MonoBehaviour
 
     public void ShowPhotoFrame(bool value)
     {
-        photoFrame.SetActive(value);
+        photoframe.SetActive(value);
+
+        photoFrameCanvasGroup.alpha = 1f;
+
+        fadingAnimation.SetTrigger("FadeOut");
     }
 
-    public void ReceiveTakenPicture(Texture2D texture)
+    public void ReceiveTakenPicture(Sprite texture)
     {
-        screenCapture = texture;
+        photoDisplayTexture.sprite = texture;
+
+        StartCoroutine(FadeOutPhoto());
+    }
+
+    private IEnumerator FadeOutPhoto()
+    {
+        yield return new WaitForSeconds(2f);
+
+        photoFrameCanvasGroup.alpha = 0f;
     }
 }
