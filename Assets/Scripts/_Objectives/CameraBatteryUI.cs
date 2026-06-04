@@ -8,16 +8,26 @@ public class CameraBatteryUI : MonoBehaviour
 
     private void OnEnable()
     {
-        cameraManager.OnPhotoTaken += CameraManager_OnPhotoTaken;
+        cameraManager.OnPhotoSuccesfullTaken += CameraManager_OnPhotoTaken;
     }
 
     private void OnDisable()
     {
-        cameraManager.OnPhotoTaken -= CameraManager_OnPhotoTaken;
+        cameraManager.OnPhotoSuccesfullTaken -= CameraManager_OnPhotoTaken;
     }
 
-    private void CameraManager_OnPhotoTaken()
+    private void CameraManager_OnPhotoTaken(int id)
     {
-        
+        for (int i = batterySprites.Length - 1; i >= 0; i--)
+        {
+            if (batterySprites[i].color.a > 0f)
+            {
+                Color transparent = batterySprites[i].color;
+                transparent.a = 0f;
+
+                batterySprites[i].color = transparent;
+                break;
+            }
+        }
     }
 }

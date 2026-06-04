@@ -1,12 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using TMPro;
 
 public class ObjectiveManager : MonoBehaviour
 {
     public static ObjectiveManager Instance;
 
+    [SerializeField] private CameraManager cameraManager;
     [SerializeField] private List<Objective> allObjectives = new();
 
     private void Awake()
@@ -14,20 +14,32 @@ public class ObjectiveManager : MonoBehaviour
         Instance = this;
     }
 
-    public void CompleteObjective(Objective objective, int id)
+    private void OnEnable()
     {
-        if (allObjectives.Contains(objective))
+        cameraManager.OnPhotoSuccesfullTaken += AddCompeltedObjective;
+
+    }
+
+    private void OnDisable()
+    {
+        cameraManager.OnPhotoSuccesfullTaken -= AddCompeltedObjective;
+    }
+
+    public void AddCompeltedObjective(int id)
+    {
+        Objective obj = allObjectives.FirstOrDefault(o => o.objectiveID == id);
+        if (obj != null && !obj.IsCompleted())
         {
-            if (objective.IsCompleted) 
-                return;
+            obj.Capture();
+            AllCompletedCheck();
+        }
+    }
 
-            objective.Complete();
-
-            if (allObjectives.TrueForAll(obj => obj.IsCompleted))
-            {
-                Debug.Log("All objectives completed!");
-                GameManager.Instance.SetState(GameState.Outro);
-            }
+    public void AllCompletedCheck()
+    {
+        if (allObjectives.All(obj => obj.IsCompleted()))
+        {
+            GameManager.Instance.SetState(GameState.Outro);
         }
     }
 }

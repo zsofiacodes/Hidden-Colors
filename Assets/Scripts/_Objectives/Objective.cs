@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class Objective : MonoBehaviour, IObjective
+public class Objective : MonoBehaviour
 {
     public int objectiveID;
-    public bool IsCompleted = false;
+    public bool isCompleted = false;
     private Renderer targetRenderer;
 
     private void Start()
@@ -11,26 +11,19 @@ public class Objective : MonoBehaviour, IObjective
         targetRenderer = GetComponent<Renderer>();
     }
 
-    public void Interact()
-    {
-        //When the user presses E, then you do this (bring camera up)
-    }
-
     public void Capture()
     {
-        //When the user presses C, then you do this (make the picture)
-        IsCompleted = true;
-        ObjectiveManager.Instance.CompleteObjective(this, objectiveID);
+        isCompleted = true;
     }
 
-    public void Complete()
+    public bool IsCompleted()
     {
-        IsCompleted = true;
+        return isCompleted;
     }
 
     public bool IsInView(Camera cam)
     {
-        if (IsCompleted || targetRenderer == null) return false;
+        if (isCompleted || targetRenderer == null) return false;
 
         Plane[] planes = GeometryUtility.CalculateFrustumPlanes(cam);
         return GeometryUtility.TestPlanesAABB(planes, targetRenderer.bounds);

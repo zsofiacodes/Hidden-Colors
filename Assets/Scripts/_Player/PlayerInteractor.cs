@@ -8,7 +8,7 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] private LayerMask interactableLayer;
     [SerializeField] private Transform rayStartPoint;
 
-    private Interactable focusedInteractable;
+    private OutlineManager focusedInteractable;
 
     public Action OnWithinInteractRange;
 
@@ -25,7 +25,7 @@ public class PlayerInteractor : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, interactRange, interactableLayer))
         {
-            if (hit.collider.TryGetComponent(out Interactable target))
+            if (hit.collider.TryGetComponent(out OutlineManager target))
             {
                 if (target != focusedInteractable)
                 {
