@@ -10,7 +10,8 @@ public class PlayerInteractor : MonoBehaviour
 
     private OutlineManager focusedInteractable;
 
-    public Action OnWithinInteractRange;
+    public Action<bool> OnWithinInteractRange;
+    public Action<Objective> OnUpdateActiveObjective;
 
     private void Update()
     {
@@ -19,6 +20,9 @@ public class PlayerInteractor : MonoBehaviour
 
     private void CheckForInteractable()
     {
+        if (GameManager.Instance.currentState == GameState.Tutorial)
+            return;
+
         Vector3 rayStart = rayStartPoint.position + (rayStartPoint.forward * 0.1f);
         Ray ray = new Ray(rayStart, rayStartPoint.forward);
         Debug.DrawRay(rayStart, rayStartPoint.forward * interactRange, Color.red);
@@ -27,12 +31,28 @@ public class PlayerInteractor : MonoBehaviour
         {
             if (hit.collider.TryGetComponent(out OutlineManager target))
             {
+                if (target.GetComponent<Objective>().isCompleted)
+                {
+                    if (focusedInteractable != null)
+                    {
+                        focusedInteractable.OnLoseFocus();
+                        focusedInteractable = null;
+                    }
+                        
+                    OnWithinInteractRange?.Invoke(false);
+                    return;
+                }
+
                 if (target != focusedInteractable)
                 {
-                    if (focusedInteractable != null) focusedInteractable.OnLoseFocus();
+                    if (focusedInteractable != null) 
+                        focusedInteractable.OnLoseFocus();
+
                     focusedInteractable = target;
                     focusedInteractable.OnGainFocus();
-                    OnWithinInteractRange?.Invoke();
+
+                    OnWithinInteractRange?.Invoke(true);
+                    OnUpdateActiveObjective?.Invoke(target.GetComponent<Objective>());
                 }
 
                 return;
@@ -43,6 +63,7 @@ public class PlayerInteractor : MonoBehaviour
         {
             focusedInteractable.OnLoseFocus();
             focusedInteractable = null;
+            OnWithinInteractRange?.Invoke(false);
         }
     }
 }

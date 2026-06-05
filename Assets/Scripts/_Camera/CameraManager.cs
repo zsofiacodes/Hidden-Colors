@@ -1,12 +1,10 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Splines;
-using UnityEngine.UI;
+
 
 public class CameraManager : MonoBehaviour
 {
@@ -18,6 +16,7 @@ public class CameraManager : MonoBehaviour
 
     [SerializeField] private float interactRange = 5f;
     [SerializeField] private LayerMask interactableLayer;
+    [SerializeField] private Transform rayStartPoint;
 
     public event Action<int> OnPhotoSuccesfullTaken;
     public event Action<bool> OnChangeWorld;
@@ -45,59 +44,42 @@ public class CameraManager : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance.currentState != GameState.Tutorial)
+        if (GameManager.Instance.currentState == GameState.Tutorial) return;
+
+        if (Keyboard.current.eKey.wasPressedThisFrame)
         {
-            if (Keyboard.current.eKey.wasPressedThisFrame)
+            if (!isCameraModeActive && TryGetValidObjective(out Objective objective))
             {
-                if (!isCameraModeActive && TryGetValidObjective(out Objective objective))
-                    EnterCameraMode();
-
-                else
-                    ExitCameraMode();
+                currentTarget = objective;
+                currentObjectiveID = objective.objectiveID;
+                EnterCameraMode();
             }
-
-            if (Keyboard.current.cKey.wasPressedThisFrame)
+            else if (isCameraModeActive)
             {
-                if (!isCameraModeActive) return;
-
-                ObjectiveInsightCheck();
+                ExitCameraMode();
             }
         }
-    }
 
-    private void ObjectiveInsightCheck()
-    {
-        // 1. Logic check: Is there a valid, incomplete objective in sight?
-        if (TryGetValidObjective(out Objective objective))
+        if (isCameraModeActive && Keyboard.current.cKey.wasPressedThisFrame && currentTarget != null && !currentTarget.isCompleted)
         {
-            // 2. Action: If we found one, perform the snapshot
-            currentTarget = objective;
-            currentObjectiveID = objective.objectiveID;
-
-            StartCoroutine(TakeSnapShot(objective.objectiveID));
-        }
-        else
-        {
-            // Handle the "nothing found" state
-            currentTarget = null;
-            currentObjectiveID = -1;
-            Debug.Log("No valid, incomplete objective in sight.");
+            StartCoroutine(TakeSnapShot(currentTarget.objectiveID));
         }
     }
 
     private bool TryGetValidObjective(out Objective foundObjective)
     {
         foundObjective = null;
-        Ray ray = new Ray(photoPOVCamera.transform.position, photoPOVCamera.transform.forward);
+
+        Vector3 rayStart = rayStartPoint.position + (rayStartPoint.forward * 0.1f);
+        Ray ray = new Ray(rayStart, rayStartPoint.forward);
+
+        Debug.DrawRay(rayStart, rayStartPoint.forward * interactRange, Color.green);
 
         if (Physics.Raycast(ray, out RaycastHit hit, interactRange, interactableLayer))
         {
-            Debug.DrawRay(photoPOVCamera.transform.position, photoPOVCamera.transform.forward * interactRange, Color.green);
-
-            // Check if it has the component AND it is not already completed
-            if (hit.collider.TryGetComponent<Objective>(out var objective) && !objective.isCompleted)
+            if (hit.collider.TryGetComponent(out Objective obj) && !obj.isCompleted)
             {
-                foundObjective = objective;
+                foundObjective = obj;
                 return true;
             }
         }
@@ -158,14 +140,14 @@ public class CameraManager : MonoBehaviour
         OnChangeWorld?.Invoke(false);
         ScreenCaptureLogic(id, "poverty");
 
-        yield return new WaitForEndOfFrame();
-
         OnChangeWorld?.Invoke(true);
         ScreenCaptureLogic(id, "normal");
 
+        yield return new WaitForEndOfFrame();
+
         UseBattery();
 
-        ShowPhoto();
+        ShowPhoto(id, "normal");
     }
 
     private void ScreenCaptureLogic(int areaID, string state)
@@ -189,6 +171,14 @@ public class CameraManager : MonoBehaviour
         Destroy(texture);
 
         screenCapture = screenshotSprite;
+
+        OpenSaveFolder();
+    }
+
+    public void OpenSaveFolder()
+    {
+        // This opens the folder in the default file explorer (Windows/Mac)
+        //System.Diagnostics.Process.Start(Application.persistentDataPath);
     }
 
     public Sprite LoadSingleImage(int areaID, string state)
@@ -219,8 +209,8 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    private void ShowPhoto()
+    private void ShowPhoto(int areaID, string state)
     {
-        cameraUI.ReceiveTakenPicture(screenCapture);
+        cameraUI.ReceiveTakenPicture(LoadSingleImage(areaID, state));
     }
 }

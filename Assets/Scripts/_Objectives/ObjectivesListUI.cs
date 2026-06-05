@@ -18,6 +18,7 @@ public class ObjectivesListUI : MonoBehaviour
 
     private void UpdateObjectivesList(int id)
     {
+        Debug.Log($"Updating Objectives List for Objective ID: {id}");
         objectiveTextSlots[id].color = Color.green;
         objectiveTextSlots[id].fontStyle = FontStyles.Strikethrough;
 }

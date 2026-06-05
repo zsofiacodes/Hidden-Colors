@@ -6,8 +6,8 @@ public class CameraUI : MonoBehaviour
 {
     [Header("Photo Taker UI")]
     [SerializeField] private Image photoDisplayTexture;
+    [SerializeField] private Sprite photoTexture;
     [SerializeField] private GameObject photoframe;
-    [SerializeField] private CanvasGroup photoFrameCanvasGroup;
     [SerializeField] private GameObject cameraUI;
     [SerializeField] private GameObject[] batteryUIBars;
 
@@ -17,12 +17,10 @@ public class CameraUI : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private AudioSource cameraAudio;
 
-    private Texture2D screenCapture;
-
     private void Start()
     {
         ShowCameraUI(false);
-        ShowPhotoFrame(false);
+        StartCoroutine(ShowPhotoFrame(false));
     }
 
     public void ShowCameraUI(bool value)
@@ -30,26 +28,24 @@ public class CameraUI : MonoBehaviour
         cameraUI.SetActive(value);
     }
 
-    public void ShowPhotoFrame(bool value)
+    public void ReceiveTakenPicture(Sprite texture)
+    {
+        photoTexture = texture;
+        photoDisplayTexture.sprite = photoTexture;
+
+        StartCoroutine(ShowPhotoFrame(true));
+    }
+
+    public IEnumerator ShowPhotoFrame(bool value)
     {
         photoframe.SetActive(value);
 
-        photoFrameCanvasGroup.alpha = 1f;
+        photoDisplayTexture.sprite = photoTexture;
 
-        fadingAnimation.SetTrigger("FadeOut");
-    }
+        fadingAnimation.SetTrigger("FadePhotoIn");
 
-    public void ReceiveTakenPicture(Sprite texture)
-    {
-        photoDisplayTexture.sprite = texture;
+        yield return new WaitForSeconds(10f);
 
-        StartCoroutine(FadeOutPhoto());
-    }
-
-    private IEnumerator FadeOutPhoto()
-    {
-        yield return new WaitForSeconds(2f);
-
-        photoFrameCanvasGroup.alpha = 0f;
+        photoframe.SetActive(false);
     }
 }

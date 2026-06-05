@@ -1,24 +1,66 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlayerInteractIndicator : MonoBehaviour
 {
     [SerializeField] private CanvasGroup indicatorCanvasGroup;
     [SerializeField] private PlayerInteractor playerInteractor;
+    [SerializeField] private Vector3 worldOffset = new Vector3(0, 2f, 0);
+
+    private RectTransform uiElement;
+    private Transform targetObject;
+
+    private void Awake()
+    {
+        uiElement = GetComponent<RectTransform>();
+    }
 
     private void OnEnable()
     {
-        playerInteractor.OnWithinInteractRange += ShowIndicator;
+        playerInteractor.OnWithinInteractRange += IndiactorHelperMethod;
+        playerInteractor.OnUpdateActiveObjective += UpdateActiveObjective;
     }
 
     private void OnDisable()
     {
-        playerInteractor.OnWithinInteractRange -= ShowIndicator;
+        playerInteractor.OnWithinInteractRange -= IndiactorHelperMethod;
+        playerInteractor.OnUpdateActiveObjective -= UpdateActiveObjective;
     }
 
 
     private void Start()
     {
         HideIndicator();
+    }
+
+    private void Update()
+    {
+        if (targetObject == null) return;
+
+        Vector3 targetPositionWithOffset = targetObject.position + worldOffset;
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(targetPositionWithOffset);
+
+        if (screenPos.z > 0)
+        {
+            uiElement.position = screenPos;
+        }
+    }
+
+    public void IndiactorHelperMethod(bool value)
+    {
+        if (value)
+        {
+            ShowIndicator();
+        }
+        else
+        {
+            HideIndicator();
+        }
+    }
+
+    public void UpdateActiveObjective(Objective newObjective)
+    {
+        targetObject = newObjective.transform;
     }
 
     public void ShowIndicator()
