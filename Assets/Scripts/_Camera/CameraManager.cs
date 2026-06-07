@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.IO;
 using Unity.Cinemachine;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,6 +19,7 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private LayerMask interactableLayer;
     [SerializeField] private Transform rayStartPoint;
 
+    public event Action<bool> OnPhotomode;
     public event Action<int> OnPhotoSuccesfullTaken;
     public event Action<bool> OnChangeWorld;
 
@@ -97,6 +99,8 @@ public class CameraManager : MonoBehaviour
         playerController.enabled = false;
         cameraUI.ShowCameraUI(true);
 
+        OnPhotomode?.Invoke(false);
+
         GameManager.Instance.SetState(GameState.TakingPicture);
     }
 
@@ -110,6 +114,8 @@ public class CameraManager : MonoBehaviour
         playerMesh.SetActive(true);
         playerController.enabled = true;
         cameraUI.ShowCameraUI(false);
+
+        OnPhotomode?.Invoke(true);
 
         GameManager.Instance.SetState(GameState.Free);
     }
@@ -135,7 +141,11 @@ public class CameraManager : MonoBehaviour
 
     private IEnumerator TakeSnapShot(int id)
     {
+        cameraUI.ShowCameraUI(false);
+
         yield return new WaitForEndOfFrame();
+
+        AudioManager.Instance.PlayShutterSoundSFX();
 
         OnChangeWorld?.Invoke(false);
         ScreenCaptureLogic(id, "poverty");
@@ -144,6 +154,8 @@ public class CameraManager : MonoBehaviour
         ScreenCaptureLogic(id, "normal");
 
         yield return new WaitForEndOfFrame();
+
+        cameraUI.ShowCameraUI(true);
 
         UseBattery();
 

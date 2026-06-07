@@ -7,11 +7,24 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] private float interactRange = 5f;
     [SerializeField] private LayerMask interactableLayer;
     [SerializeField] private Transform rayStartPoint;
+    [SerializeField] private CameraManager cameraManager;
+
+    public bool isLookingAtObjective = false;
 
     private OutlineManager focusedInteractable;
 
     public Action<bool> OnWithinInteractRange;
     public Action<Objective> OnUpdateActiveObjective;
+
+    private void OnEnable()
+    {
+        cameraManager.OnPhotomode += SetLookingAtObjective;
+    }
+
+    private void OnDisable()
+    {
+        cameraManager.OnPhotomode -= SetLookingAtObjective;
+    }
 
     private void Update()
     {
@@ -21,6 +34,9 @@ public class PlayerInteractor : MonoBehaviour
     private void CheckForInteractable()
     {
         if (GameManager.Instance.currentState == GameState.Tutorial)
+            return;
+
+        if (isLookingAtObjective)
             return;
 
         Vector3 rayStart = rayStartPoint.position + (rayStartPoint.forward * 0.1f);
@@ -65,5 +81,10 @@ public class PlayerInteractor : MonoBehaviour
             focusedInteractable = null;
             OnWithinInteractRange?.Invoke(false);
         }
+    }
+
+    public void SetLookingAtObjective(bool value)
+    {
+        isLookingAtObjective = !value;
     }
 }

@@ -1787,6 +1787,7 @@ GameObject:
   - component: {fileID: 678124160}
   - component: {fileID: 678124159}
   - component: {fileID: 678124161}
+  - component: {fileID: 678124162}
   m_Layer: 5
   m_Name: ObjectiveChecklist
   m_TagString: Untagged
@@ -1873,12 +1874,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObjectivesListUI
   cameraManager: {fileID: 1660888068}
+  canvasGroup: {fileID: 678124162}
   objectiveTextSlots:
   - {fileID: 2071003910}
   - {fileID: 830937016}
   - {fileID: 1496494693}
   - {fileID: 661066233}
-  - {fileID: 661066233}
+  - {fileID: 80338622}
+--- !u!225 &678124162
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 678124157}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &681518372
 GameObject:
   m_ObjectHideFlags: 0
@@ -2501,6 +2515,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81a7dfb3a9940034e8680fd0981664aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractIndicator
+  cameraManager: {fileID: 1660888068}
   indicatorCanvasGroup: {fileID: 851431789}
   playerInteractor: {fileID: 1411093502}
   worldOffset: {x: 0, y: 1, z: 0}
@@ -3707,6 +3722,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhotoTarget
   objectiveID: 0
+  isBeingFocused: 0
   isCompleted: 0
 --- !u!114 &1356308254
 MonoBehaviour:
@@ -3738,6 +3754,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59d371234dec8564a8a8112ac5baa844, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OutlineManager
+  playerInteractor: {fileID: 1411093502}
+  cameraManager: {fileID: 1660888068}
 --- !u!1 &1367649286
 GameObject:
   m_ObjectHideFlags: 0
@@ -4171,6 +4189,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   rayStartPoint: {fileID: 421426511}
+  cameraManager: {fileID: 1660888068}
+  isLookingAtObjective: 0
 --- !u!114 &1411093503
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4332,6 +4352,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhotoTarget
   objectiveID: 1
+  isBeingFocused: 0
   isCompleted: 0
 --- !u!65 &1425492342
 BoxCollider:
@@ -4456,6 +4477,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59d371234dec8564a8a8112ac5baa844, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OutlineManager
+  playerInteractor: {fileID: 1411093502}
+  cameraManager: {fileID: 1660888068}
 --- !u!1 &1452934995
 GameObject:
   m_ObjectHideFlags: 0
@@ -4779,6 +4802,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhotoTarget
   objectiveID: 2
+  isBeingFocused: 0
   isCompleted: 0
 --- !u!65 &1459346870
 BoxCollider:
@@ -4903,6 +4927,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59d371234dec8564a8a8112ac5baa844, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OutlineManager
+  playerInteractor: {fileID: 1411093502}
+  cameraManager: {fileID: 1660888068}
 --- !u!1 &1496494691
 GameObject:
   m_ObjectHideFlags: 0
@@ -5249,6 +5275,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhotoTarget
   objectiveID: 3
+  isBeingFocused: 0
   isCompleted: 0
 --- !u!65 &1600019087
 BoxCollider:
@@ -5373,6 +5400,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59d371234dec8564a8a8112ac5baa844, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OutlineManager
+  playerInteractor: {fileID: 1411093502}
+  cameraManager: {fileID: 1660888068}
 --- !u!1 &1638378807
 GameObject:
   m_ObjectHideFlags: 0
@@ -6264,6 +6293,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PhotoTarget
   objectiveID: 4
+  isBeingFocused: 0
   isCompleted: 0
 --- !u!65 &1996047945
 BoxCollider:
@@ -6388,6 +6418,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59d371234dec8564a8a8112ac5baa844, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OutlineManager
+  playerInteractor: {fileID: 1411093502}
+  cameraManager: {fileID: 1660888068}
 --- !u!1 &1996682506
 GameObject:
   m_ObjectHideFlags: 0

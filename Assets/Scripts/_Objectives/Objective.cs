@@ -3,6 +3,7 @@ using UnityEngine;
 public class Objective : MonoBehaviour
 {
     public int objectiveID;
+    public bool isBeingFocused = false;
     public bool isCompleted = false;
     private Renderer targetRenderer;
 
@@ -14,6 +15,11 @@ public class Objective : MonoBehaviour
     public void Capture()
     {
         isCompleted = true;
+    }
+
+    public void Focus(bool value)
+    {
+        isBeingFocused = value;
     }
 
     public bool IsCompleted()

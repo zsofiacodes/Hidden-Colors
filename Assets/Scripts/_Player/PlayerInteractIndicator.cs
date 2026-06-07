@@ -3,6 +3,7 @@ using UnityEngine.UIElements;
 
 public class PlayerInteractIndicator : MonoBehaviour
 {
+    [SerializeField] private CameraManager cameraManager;
     [SerializeField] private CanvasGroup indicatorCanvasGroup;
     [SerializeField] private PlayerInteractor playerInteractor;
     [SerializeField] private Vector3 worldOffset = new Vector3(0, 2f, 0);
@@ -17,12 +18,14 @@ public class PlayerInteractIndicator : MonoBehaviour
 
     private void OnEnable()
     {
+        cameraManager.OnPhotomode += IndiactorHelperMethod;
         playerInteractor.OnWithinInteractRange += IndiactorHelperMethod;
         playerInteractor.OnUpdateActiveObjective += UpdateActiveObjective;
     }
 
     private void OnDisable()
     {
+        cameraManager.OnPhotomode -= IndiactorHelperMethod;
         playerInteractor.OnWithinInteractRange -= IndiactorHelperMethod;
         playerInteractor.OnUpdateActiveObjective -= UpdateActiveObjective;
     }
