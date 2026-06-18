@@ -23,6 +23,7 @@ public class WorldSwapManager : MonoBehaviour
 
     private void ShowWorldType(bool showNormal)
     {
+        return;
         if (showNormal)
         {
             worldNormal.SetActive(true);

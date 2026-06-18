@@ -38,8 +38,6 @@ public class ObjectivesListUI : MonoBehaviour
         {
             if (i == id)
             {
-                Debug.Log($"Updating Objectives List for Objective ID: {id}");
-                Debug.Log($"{i}");
                 objectiveTextSlots[i].color = Color.green;
                 objectiveTextSlots[i].fontStyle = FontStyles.Strikethrough;
             }

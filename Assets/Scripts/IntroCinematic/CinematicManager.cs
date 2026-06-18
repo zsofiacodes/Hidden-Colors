@@ -11,30 +11,33 @@ public class CinematicManager : MonoBehaviour
     {
         if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            cinematicAnimator.speed = 10f;
+            if (cinematicAnimator != null) cinematicAnimator.speed = 10f;
         }
     }
 
-    public void PlayLaughEvent()
-    {
-        AudioManager.Instance.PlayKidLaughingSFX();
-    }
-
-    public void PlayFallEvent()
-    {
-        AudioManager.Instance.PlayKidFallSFX();
-    }
+    public void PlayLaughEvent() => AudioManager.Instance.PlayKidLaughingSFX();
+    public void PlayFallEvent() => AudioManager.Instance.PlayKidFallSFX();
 
     public void CinematicHasEnded()
     {
         StartCoroutine(CinematicHasEndedCoroutine());
-        GameManager.Instance.SetState(GameState.Tutorial);
     }
 
     private IEnumerator CinematicHasEndedCoroutine()
     {
         SceneTransitionUIManager.Instance.StartTransition();
         yield return new WaitForSeconds(1f);
-        SceneManager.LoadScene("Game");
+
+        // This checks if we are in the Game scene to go to Outro
+        if (SceneManager.GetActiveScene().name == "Game")
+        {
+            SceneManager.LoadScene("OutroCinematic");
+        }
+        // This handles your existing flow for the Intro
+        else if (SceneManager.GetActiveScene().name == "IntroCinematic")
+        {
+            GameManager.Instance.SetState(GameState.Tutorial);
+            SceneManager.LoadScene("Game");
+        }
     }
 }

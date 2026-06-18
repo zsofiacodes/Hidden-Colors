@@ -8,6 +8,7 @@ public class CameraUI : MonoBehaviour
     [SerializeField] private Image photoDisplayTexture;
     [SerializeField] private Sprite photoTexture;
     [SerializeField] private GameObject photoframe;
+    [SerializeField] private CanvasGroup photoframeCanvasGroup;
     [SerializeField] private GameObject cameraUI;
     [SerializeField] private GameObject[] batteryUIBars;
 
@@ -20,7 +21,7 @@ public class CameraUI : MonoBehaviour
     private void Start()
     {
         ShowCameraUI(false);
-        StartCoroutine(ShowPhotoFrame(false));
+        photoframeCanvasGroup.alpha = 0f;
     }
 
     public void ShowCameraUI(bool value)
@@ -38,14 +39,25 @@ public class CameraUI : MonoBehaviour
 
     public IEnumerator ShowPhotoFrame(bool value)
     {
-        photoframe.SetActive(value);
+        photoframe.SetActive(true);
 
         photoDisplayTexture.sprite = photoTexture;
-
         fadingAnimation.SetTrigger("FadePhotoIn");
 
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(3f);
 
+        float duration = 1.0f; // Time in seconds
+        float elapsed = 0f;
+
+        photoframeCanvasGroup.alpha = 1f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            photoframeCanvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
+            yield return null; // Wait for the next frame
+        }
+        photoframeCanvasGroup.alpha = 0f;
         photoframe.SetActive(false);
     }
 }

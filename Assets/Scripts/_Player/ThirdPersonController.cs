@@ -33,17 +33,22 @@ public class ThirdPersonController : MonoBehaviour
 
     private void Update()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundRadius, groundLayer);
+        isGrounded = Physics.CheckSphere(
+            groundCheck.position,
+            groundRadius,
+            groundLayer
+        );
 
-        transform.Rotate(Vector3.up * lookInput.x * lookSensitivity);
-
+        // Camera pitch (up/down look)
         cameraPitch -= lookInput.y * lookSensitivity;
         cameraPitch = Mathf.Clamp(cameraPitch, -30f, 70f);
         cameraTarget.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
 
         if (animator != null)
         {
-            float currentHorizontalSpeed = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude;
+            float currentHorizontalSpeed =
+                new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).magnitude;
+
             animator.SetFloat("Speed", currentHorizontalSpeed / runSpeed);
             animator.SetBool("Grounded", isGrounded);
             animator.SetBool("Falling", !isGrounded && rb.linearVelocity.y < -0.1f);
@@ -52,13 +57,27 @@ public class ThirdPersonController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Rotate character around Y axis using Rigidbody
+        float yaw = lookInput.x * lookSensitivity;
+        Quaternion rotation = Quaternion.Euler(0f, yaw, 0f);
+
+        rb.MoveRotation(rb.rotation * rotation);
+
+        // Movement
         bool canRun = isRunning && moveInput.y > 0.1f;
         float currentSpeed = canRun ? runSpeed : walkSpeed;
 
-        Vector3 movement = (transform.forward * moveInput.y) + (transform.right * moveInput.x);
+        Vector3 movement =
+            (transform.forward * moveInput.y) +
+            (transform.right * moveInput.x);
+
         movement = movement.normalized * currentSpeed;
 
-        rb.linearVelocity = new Vector3(movement.x, rb.linearVelocity.y, movement.z);
+        rb.linearVelocity = new Vector3(
+            movement.x,
+            rb.linearVelocity.y,
+            movement.z
+        );
     }
 
     public void OnMove(InputValue value) => moveInput = value.Get<Vector2>();

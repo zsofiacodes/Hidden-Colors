@@ -1,7 +1,9 @@
 using System;
+using System.Collections; // Required for IEnumerator
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public enum GameState { MainMenu, IntroCinematic, Tutorial, Free, TakingPicture, Outro}
+public enum GameState { MainMenu, IntroCinematic, Tutorial, Free, TakingPicture, Outro }
 
 public class GameManager : MonoBehaviour
 {
@@ -43,24 +45,37 @@ public class GameManager : MonoBehaviour
             case GameState.Free:
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
-
                 FindReferences();
                 break;
 
             case GameState.TakingPicture:
-               
                 break;
 
             case GameState.Outro:
-                Debug.Log("Switching to Reality Mode...");
+                Debug.Log("Switching to Reality Mode... Starting transition.");
+                StartCoroutine(TransitionAndLoadOutro());
                 break;
         }
 
         stateChange?.Invoke(currentState);
     }
 
+    // This is now outside SetState where it belongs!
+    private IEnumerator TransitionAndLoadOutro()
+    {
+        if (SceneTransitionUIManager.Instance != null)
+        {
+            SceneTransitionUIManager.Instance.StartTransition();
+            yield return new WaitForSeconds(0.6f);
+        }
+
+        SceneManager.LoadScene("OutroCinematic");
+    }
+
     public void FindReferences()
     {
+        if (SceneManager.GetActiveScene().name == "OutroCinematic") return;
+
         if (cameraManager == null)
         {
             cameraManager = FindFirstObjectByType<CameraManager>();
@@ -70,5 +85,10 @@ public class GameManager : MonoBehaviour
         {
             objectiveManager = FindFirstObjectByType<ObjectiveManager>();
         }
+    }
+
+    public void EndGame()
+    {
+        SceneManager.LoadScene("OutroCinematic");
     }
 }

@@ -6,7 +6,6 @@ using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-
 public class CameraManager : MonoBehaviour
 {
     [Header("Cameras")]
@@ -19,6 +18,19 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private LayerMask interactableLayer;
     [SerializeField] private Transform rayStartPoint;
 
+    [Header("Zoom Settings")]
+    [SerializeField] private float minFOV = 15f;
+    [SerializeField] private float maxFOV = 60f;
+    [SerializeField] private float zoomSpeed = 5f;
+
+    [Header("Camera Culling")]
+    [SerializeField] private Camera normalCamera;
+    [SerializeField] private Camera povertyCamera;
+
+    [Header("Camera Culling")]
+    [SerializeField] private RenderTexture normalRT;
+    [SerializeField] private RenderTexture povertyRT;
+
     public event Action<bool> OnPhotomode;
     public event Action<int> OnPhotoSuccesfullTaken;
     public event Action<bool> OnChangeWorld;
@@ -26,7 +38,7 @@ public class CameraManager : MonoBehaviour
     private int photosLeft = 5;
     private Sprite screenCapture;
     private Objective currentTarget;
-    
+
     private bool isCameraModeActive = false;
     private int currentObjectiveID;
 
@@ -42,11 +54,32 @@ public class CameraManager : MonoBehaviour
     private void Start()
     {
         photoPOVCamera.Priority = 5;
+
+        ClampCameraMovement(false);
     }
 
     private void Update()
     {
         if (GameManager.Instance.currentState == GameState.Tutorial) return;
+
+        // --- NEW: Zoom Logic ---
+        if (isCameraModeActive)
+        {
+            float scroll = Mouse.current.scroll.ReadValue().y;
+
+            if (scroll != 0)
+            {
+                // Remove * Time.deltaTime to make it reactive to the scroll wheel movement
+                // Increase the 0.05f multiplier to make it zoom faster if needed
+                float zoomAmount = scroll * 0.05f;
+
+                float currentFOV = photoPOVCamera.Lens.FieldOfView;
+                currentFOV -= zoomAmount * zoomSpeed; // zoomSpeed now acts as a simple sensitivity multiplier
+
+                photoPOVCamera.Lens.FieldOfView = Mathf.Clamp(currentFOV, minFOV, maxFOV);
+            }
+        }
+        // -----------------------
 
         if (Keyboard.current.eKey.wasPressedThisFrame)
         {
@@ -64,9 +97,10 @@ public class CameraManager : MonoBehaviour
 
         if (isCameraModeActive && Keyboard.current.cKey.wasPressedThisFrame && currentTarget != null && !currentTarget.isCompleted)
         {
-            StartCoroutine(TakeSnapShot(currentTarget.objectiveID));
+            TakeSnapShot(currentTarget.objectiveID);
         }
     }
+
 
     private bool TryGetValidObjective(out Objective foundObjective)
     {
@@ -75,8 +109,8 @@ public class CameraManager : MonoBehaviour
         Vector3 rayStart = rayStartPoint.position + (rayStartPoint.forward * 0.1f);
         Ray ray = new Ray(rayStart, rayStartPoint.forward);
 
-        Debug.DrawRay(rayStart, rayStartPoint.forward * interactRange, Color.green);
-
+        // This is the line that matters! 
+        // It will now check everything assigned to the 'interactableLayer' mask.
         if (Physics.Raycast(ray, out RaycastHit hit, interactRange, interactableLayer))
         {
             if (hit.collider.TryGetComponent(out Objective obj) && !obj.isCompleted)
@@ -84,13 +118,14 @@ public class CameraManager : MonoBehaviour
                 foundObjective = obj;
                 return true;
             }
+
         }
         return false;
+
     }
 
     private void EnterCameraMode()
     {
-        //Make a method that clamp the rotation of the POV camera to prevent the player from looking at their own body and breaking immersion.
         ClampCameraMovement(true);
 
         photoPOVCamera.Priority = 20;
@@ -104,7 +139,7 @@ public class CameraManager : MonoBehaviour
         GameManager.Instance.SetState(GameState.TakingPicture);
     }
 
-   
+
     private void ExitCameraMode()
     {
         ClampCameraMovement(false);
@@ -126,46 +161,38 @@ public class CameraManager : MonoBehaviour
 
         if (isClamped)
         {
-            // Set range to 0 to effectively "lock" the tilt
-            panTilt.TiltAxis.Range = new Vector2(-5, 5f);
+            panTilt.TiltAxis.Range = new Vector2(-45f, 100f);
+
             panTilt.PanAxis.Range = new Vector2(-15f, 15f);
         }
         else
         {
-            // Restore standard tilt range
-            panTilt.TiltAxis.Range = new Vector2(-40, 40f);
-            panTilt.PanAxis.Range = new Vector2(-180, 180f);
+            panTilt.TiltAxis.Range = new Vector2(-40f, 40f);
+            panTilt.PanAxis.Range = new Vector2(-180f, 180f);
         }
     }
 
 
-    private IEnumerator TakeSnapShot(int id)
+    private void TakeSnapShot(int id)
     {
         cameraUI.ShowCameraUI(false);
+        
+        ScreenCaptureLogic(id, "poverty", povertyRT);
 
-        yield return new WaitForEndOfFrame();
-
-        AudioManager.Instance.PlayShutterSoundSFX();
-
-        OnChangeWorld?.Invoke(false);
-        ScreenCaptureLogic(id, "poverty");
-
-        OnChangeWorld?.Invoke(true);
-        ScreenCaptureLogic(id, "normal");
-
-        yield return new WaitForEndOfFrame();
+        ScreenCaptureLogic(id, "normal", normalRT);
 
         cameraUI.ShowCameraUI(true);
-
         UseBattery();
-
-        ShowPhoto(id, "normal");
+        StartCoroutine(ShowPhoto(id, "normal"));
     }
 
-    private void ScreenCaptureLogic(int areaID, string state)
+    private void ScreenCaptureLogic(int areaID, string state, RenderTexture rt)
     {
-        Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
-        texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+        RenderTexture.active = rt;
+
+        Texture2D texture = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
+
+        texture.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
         texture.Apply();
 
         Sprite screenshotSprite = Sprite.Create(
@@ -180,17 +207,23 @@ public class CameraManager : MonoBehaviour
         byte[] bytes = texture.EncodeToPNG();
         File.WriteAllBytes(path, bytes);
 
-        Destroy(texture);
+        //Destroy(texture);
 
         screenCapture = screenshotSprite;
 
-        OpenSaveFolder();
+        //OpenSaveFolder();
+        // Removed OpenSaveFolder from here so it doesn't open twice per snapshot
     }
 
     public void OpenSaveFolder()
     {
-        // This opens the folder in the default file explorer (Windows/Mac)
-        //System.Diagnostics.Process.Start(Application.persistentDataPath);
+        // Using System.Diagnostics.ProcessStartInfo ensures it opens smoothly across OS environments
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+        {
+            FileName = Application.persistentDataPath,
+            UseShellExecute = true,
+            Verb = "open"
+        });
     }
 
     public Sprite LoadSingleImage(int areaID, string state)
@@ -221,8 +254,12 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    private void ShowPhoto(int areaID, string state)
+    private IEnumerator ShowPhoto(int areaID, string state)
     {
         cameraUI.ReceiveTakenPicture(LoadSingleImage(areaID, state));
+
+        yield return new WaitForSeconds(5f);
+
+        ExitCameraMode();
     }
 }
