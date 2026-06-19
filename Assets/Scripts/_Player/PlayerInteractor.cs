@@ -41,11 +41,10 @@ public class PlayerInteractor : MonoBehaviour
 
         Vector3 rayStart = rayStartPoint.position + (rayStartPoint.forward * 0.1f);
         Ray ray = new Ray(rayStart, rayStartPoint.forward);
-        Debug.DrawRay(rayStart, rayStartPoint.forward * interactRange, Color.red);
 
         if (Physics.Raycast(ray, out RaycastHit hit, interactRange, interactableLayer))
         {
-            if (hit.collider.TryGetComponent(out OutlineManager target))
+            if (hit.collider.TryGetComponent(out OutlineManager target) && GameManager.Instance.GetGameState() != GameState.FinalReality)
             {
                 if (target.GetComponent<Objective>().isCompleted)
                 {
@@ -54,14 +53,13 @@ public class PlayerInteractor : MonoBehaviour
                         focusedInteractable.OnLoseFocus();
                         focusedInteractable = null;
                     }
-                        
                     OnWithinInteractRange?.Invoke(false);
                     return;
                 }
 
                 if (target != focusedInteractable)
                 {
-                    if (focusedInteractable != null) 
+                    if (focusedInteractable != null)
                         focusedInteractable.OnLoseFocus();
 
                     focusedInteractable = target;
@@ -70,7 +68,6 @@ public class PlayerInteractor : MonoBehaviour
                     OnWithinInteractRange?.Invoke(true);
                     OnUpdateActiveObjective?.Invoke(target.GetComponent<Objective>());
                 }
-
                 return;
             }
         }

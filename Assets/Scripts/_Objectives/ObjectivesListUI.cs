@@ -7,6 +7,17 @@ public class ObjectivesListUI : MonoBehaviour
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private TextMeshProUGUI[] objectiveTextSlots;
 
+
+    private void Start()
+    {
+        // If we are in the Final Reality, hide the objectives list immediately
+        if (GameManager.Instance.currentState == GameState.FinalReality)
+        {
+            canvasGroup.alpha = 0f;
+            canvasGroup.blocksRaycasts = false;
+        }
+    }
+
     private void OnEnable()
     {
         cameraManager.OnPhotomode += ToggleObjectiveUI;

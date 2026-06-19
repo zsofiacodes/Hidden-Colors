@@ -1,9 +1,9 @@
 using System;
-using System.Collections; // Required for IEnumerator
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public enum GameState { MainMenu, IntroCinematic, Tutorial, Free, TakingPicture, Outro }
+public enum GameState { MainMenu, IntroCinematic, Tutorial, Free, TakingPicture, Outro, FinalReality }
 
 public class GameManager : MonoBehaviour
 {
@@ -14,13 +14,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CameraManager cameraManager;
     [SerializeField] private ObjectiveManager objectiveManager;
 
-    public event Action<GameState> stateChange;
+    public event Action<GameState> onStateChange;
 
     private void Awake()
     {
         if (Instance != null)
         {
-            Destroy(gameObject); return;
+            Destroy(gameObject);
+            return;
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
@@ -53,15 +54,25 @@ public class GameManager : MonoBehaviour
 
             case GameState.Outro:
                 Debug.Log("Switching to Reality Mode... Starting transition.");
-                StartCoroutine(TransitionAndLoadOutro());
+                StartCoroutine(TransitionAndLoadOutro("OutroCinematic"));
+                break;
+
+            case GameState.FinalReality:
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                StartCoroutine(TransitionAndLoadOutro("Game"));
                 break;
         }
 
-        stateChange?.Invoke(currentState);
+        onStateChange?.Invoke(currentState);
     }
 
-    // This is now outside SetState where it belongs!
-    private IEnumerator TransitionAndLoadOutro()
+    public GameState GetGameState()
+    {
+        return currentState;
+    }
+
+    private IEnumerator TransitionAndLoadOutro(string sceneName)
     {
         if (SceneTransitionUIManager.Instance != null)
         {
@@ -69,11 +80,12 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(0.6f);
         }
 
-        SceneManager.LoadScene("OutroCinematic");
+        SceneManager.LoadScene(sceneName);
     }
 
     public void FindReferences()
     {
+        // Don't look for game-specific managers in the Outro scene
         if (SceneManager.GetActiveScene().name == "OutroCinematic") return;
 
         if (cameraManager == null)

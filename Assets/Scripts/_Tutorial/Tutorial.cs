@@ -4,12 +4,12 @@ public class Tutorial : MonoBehaviour
 {
     private void Start()
     {
-        GameManager.Instance.stateChange += CloseTutorial;
+        GameManager.Instance.onStateChange += CloseTutorial;
     }
 
     private void OnDestroy()
     {
-        GameManager.Instance.stateChange -= CloseTutorial;
+        GameManager.Instance.onStateChange -= CloseTutorial;
     }
 
     public void CloseTutorial(GameState state)

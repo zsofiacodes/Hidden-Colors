@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.IO;
 using Unity.Cinemachine;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -27,7 +26,7 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private Camera normalCamera;
     [SerializeField] private Camera povertyCamera;
 
-    [Header("Camera Culling")]
+    [Header("Render Textures")]
     [SerializeField] private RenderTexture normalRT;
     [SerializeField] private RenderTexture povertyRT;
 
@@ -54,32 +53,25 @@ public class CameraManager : MonoBehaviour
     private void Start()
     {
         photoPOVCamera.Priority = 5;
-
         ClampCameraMovement(false);
     }
 
     private void Update()
     {
-        if (GameManager.Instance.currentState == GameState.Tutorial) return;
+        if (GameManager.Instance.currentState == GameState.FinalReality)
+            return;
 
-        // --- NEW: Zoom Logic ---
         if (isCameraModeActive)
         {
             float scroll = Mouse.current.scroll.ReadValue().y;
-
             if (scroll != 0)
             {
-                // Remove * Time.deltaTime to make it reactive to the scroll wheel movement
-                // Increase the 0.05f multiplier to make it zoom faster if needed
                 float zoomAmount = scroll * 0.05f;
-
                 float currentFOV = photoPOVCamera.Lens.FieldOfView;
-                currentFOV -= zoomAmount * zoomSpeed; // zoomSpeed now acts as a simple sensitivity multiplier
-
+                currentFOV -= zoomAmount * zoomSpeed;
                 photoPOVCamera.Lens.FieldOfView = Mathf.Clamp(currentFOV, minFOV, maxFOV);
             }
         }
-        // -----------------------
 
         if (Keyboard.current.eKey.wasPressedThisFrame)
         {
@@ -101,16 +93,14 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-
     private bool TryGetValidObjective(out Objective foundObjective)
     {
         foundObjective = null;
+        if (GameManager.Instance.currentState == GameState.FinalReality) return false;
 
         Vector3 rayStart = rayStartPoint.position + (rayStartPoint.forward * 0.1f);
         Ray ray = new Ray(rayStart, rayStartPoint.forward);
 
-        // This is the line that matters! 
-        // It will now check everything assigned to the 'interactableLayer' mask.
         if (Physics.Raycast(ray, out RaycastHit hit, interactRange, interactableLayer))
         {
             if (hit.collider.TryGetComponent(out Objective obj) && !obj.isCompleted)
@@ -118,51 +108,41 @@ public class CameraManager : MonoBehaviour
                 foundObjective = obj;
                 return true;
             }
-
         }
         return false;
-
     }
 
     private void EnterCameraMode()
     {
         ClampCameraMovement(true);
-
         photoPOVCamera.Priority = 20;
         isCameraModeActive = true;
         playerMesh.SetActive(false);
         playerController.enabled = false;
         cameraUI.ShowCameraUI(true);
-
         OnPhotomode?.Invoke(false);
-
         GameManager.Instance.SetState(GameState.TakingPicture);
     }
-
 
     private void ExitCameraMode()
     {
         ClampCameraMovement(false);
-
         photoPOVCamera.Priority = 5;
         isCameraModeActive = false;
         playerMesh.SetActive(true);
         playerController.enabled = true;
         cameraUI.ShowCameraUI(false);
-
         OnPhotomode?.Invoke(true);
-
         GameManager.Instance.SetState(GameState.Free);
     }
 
     private void ClampCameraMovement(bool isClamped)
     {
         var panTilt = photoPOVCamera.GetComponent<CinemachinePanTilt>();
-
+        if (panTilt == null) return;
         if (isClamped)
         {
             panTilt.TiltAxis.Range = new Vector2(-45f, 100f);
-
             panTilt.PanAxis.Range = new Vector2(-15f, 15f);
         }
         else
@@ -172,99 +152,50 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-
     private void TakeSnapShot(int id)
     {
-        // 1. Capture the images
         ScreenCaptureLogic(id, "poverty", povertyRT);
         ScreenCaptureLogic(id, "normal", normalRT);
-
-        // 2. Load and display immediately
         Sprite photo = LoadSingleImage(id, "normal");
         cameraUI.ReceiveTakenPicture(photo);
-
-        // 3. Handle game logic
         UseBattery();
-
-        // 4. Start the sequence timer
         StartCoroutine(DisplayAndCloseSequence());
     }
 
     private IEnumerator DisplayAndCloseSequence()
     {
-        // The photo is already visible. 
-        // We wait for the 3 seconds requested.
         yield return new WaitForSeconds(3f);
-
-        // After the wait, clean up UI and exit the mode
         cameraUI.HidePhotoFrame();
         ExitCameraMode();
     }
 
     private void ScreenCaptureLogic(int areaID, string state, RenderTexture rt)
     {
-        // Create a temporary Render Texture that is explicitly in sRGB format
         RenderTextureDescriptor desc = new RenderTextureDescriptor(rt.width, rt.height, RenderTextureFormat.ARGB32, 0);
-        desc.sRGB = true; // This forces the color conversion!
-
+        desc.sRGB = true;
         RenderTexture tempRT = RenderTexture.GetTemporary(desc);
-
-        // Copy the contents of your camera's RT to our sRGB-enabled temporary RT
         Graphics.Blit(rt, tempRT);
-
-        // Now read from the temporary RT
         RenderTexture.active = tempRT;
         Texture2D texture = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
         texture.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
         texture.Apply();
         RenderTexture.active = null;
-
-        // Clean up
         RenderTexture.ReleaseTemporary(tempRT);
-
-        // Save to file
         string fileName = $"Area{areaID}_{state}.png";
         string path = Path.Combine(Application.persistentDataPath, fileName);
         byte[] bytes = texture.EncodeToPNG();
         File.WriteAllBytes(path, bytes);
-
-        // Create sprite for UI
-        Sprite screenshotSprite = Sprite.Create(
-            texture,
-            new Rect(0, 0, texture.width, texture.height),
-            new Vector2(0.5f, 0.5f)
-        );
-
-        screenCapture = screenshotSprite;
-    }
-
-    public void OpenSaveFolder()
-    {
-        // Using System.Diagnostics.ProcessStartInfo ensures it opens smoothly across OS environments
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
-        {
-            FileName = Application.persistentDataPath,
-            UseShellExecute = true,
-            Verb = "open"
-        });
+        screenCapture = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
     }
 
     public Sprite LoadSingleImage(int areaID, string state)
     {
         string fileName = $"Area{areaID}_{state}.png";
         string fullPath = Path.Combine(Application.persistentDataPath, fileName);
-
-        if (!File.Exists(fullPath))
-        {
-            Debug.LogWarning($"No screenshot found at: {fullPath}");
-            return null;
-        }
-
+        if (!File.Exists(fullPath)) return null;
         byte[] fileData = File.ReadAllBytes(fullPath);
-
         Texture2D tex = new Texture2D(2, 2);
         tex.LoadImage(fileData);
-
         return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
     }
 
@@ -275,15 +206,5 @@ public class CameraManager : MonoBehaviour
             photosLeft--;
             OnPhotoSuccesfullTaken?.Invoke(currentObjectiveID);
         }
-    }
-
-    private IEnumerator ShowPhoto(int areaID, string state)
-    {
-        cameraUI.ReceiveTakenPicture(LoadSingleImage(areaID, state));
-
-        // Reduced to 1 second for a quick "snap" feel
-        yield return new WaitForSeconds(1f);
-
-        ExitCameraMode();
     }
 }

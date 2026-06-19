@@ -9684,9 +9684,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed53dd5939659914f9629bef9bdcad45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorldSwapManager
-  cameraManager: {fileID: 1660888068}
-  worldNormal: {fileID: 1511250993}
-  worldPoverty: {fileID: 1352495680}
+  mainCamera: {fileID: 330585545}
+  defaultLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  normalLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  povertyLayers:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!4 &2055820114 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: dff7f3abcfdfdff45adbabb33aea3154, type: 3}

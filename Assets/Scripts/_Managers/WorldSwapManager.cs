@@ -2,37 +2,35 @@ using UnityEngine;
 
 public class WorldSwapManager : MonoBehaviour
 {
-    [SerializeField] private CameraManager cameraManager;
-    [SerializeField] private GameObject worldNormal;
-    [SerializeField] private GameObject worldPoverty;
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private LayerMask defaultLayers;
+    [SerializeField] private LayerMask normalLayers;
+    [SerializeField] private LayerMask povertyLayers;
 
     private void OnEnable()
     {
-        cameraManager.OnChangeWorld += ShowWorldType;
+        GameManager.Instance.onStateChange += ShowWorldType;
     }
 
     private void OnDisable()
     {
-        cameraManager.OnChangeWorld -= ShowWorldType;
+        GameManager.Instance.onStateChange -= ShowWorldType;
     }
 
     private void Start()
     {
-        ShowWorldType(true);
+        ShowWorldType(GameManager.Instance.currentState);
     }
 
-    private void ShowWorldType(bool showNormal)
+    public void ShowWorldType(GameState newState)
     {
-        return;
-        if (showNormal)
+        if (newState == GameState.FinalReality)
         {
-            worldNormal.SetActive(true);
-            worldPoverty.SetActive(false);
+            mainCamera.cullingMask = defaultLayers | povertyLayers;
         }
         else
         {
-            worldNormal.SetActive(false);
-            worldPoverty.SetActive(true);
+            mainCamera.cullingMask = defaultLayers | normalLayers;
         }
     }
 }
