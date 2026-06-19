@@ -6,21 +6,17 @@ public class CameraUI : MonoBehaviour
 {
     [Header("Photo Taker UI")]
     [SerializeField] private Image photoDisplayTexture;
-    [SerializeField] private Sprite photoTexture;
     [SerializeField] private GameObject photoframe;
     [SerializeField] private CanvasGroup photoframeCanvasGroup;
     [SerializeField] private GameObject cameraUI;
-    [SerializeField] private GameObject[] batteryUIBars;
 
     [Header("Photo Fader Effect")]
     [SerializeField] private Animator fadingAnimation;
 
-    [Header("Audio")]
-    [SerializeField] private AudioSource cameraAudio;
-
     private void Start()
     {
         ShowCameraUI(false);
+        photoframe.SetActive(false);
         photoframeCanvasGroup.alpha = 0f;
     }
 
@@ -31,33 +27,17 @@ public class CameraUI : MonoBehaviour
 
     public void ReceiveTakenPicture(Sprite texture)
     {
-        photoTexture = texture;
-        photoDisplayTexture.sprite = photoTexture;
+        // Simply display the photo
+        photoDisplayTexture.sprite = texture;
 
-        StartCoroutine(ShowPhotoFrame(true));
+        photoframe.SetActive(true);
+        photoframeCanvasGroup.alpha = 1f;
+        fadingAnimation.SetTrigger("FadePhotoIn");
     }
 
-    public IEnumerator ShowPhotoFrame(bool value)
+    public void HidePhotoFrame()
     {
-        photoframe.SetActive(true);
-
-        photoDisplayTexture.sprite = photoTexture;
-        fadingAnimation.SetTrigger("FadePhotoIn");
-
-        yield return new WaitForSeconds(3f);
-
-        float duration = 1.0f; // Time in seconds
-        float elapsed = 0f;
-
-        photoframeCanvasGroup.alpha = 1f;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            photoframeCanvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
-            yield return null; // Wait for the next frame
-        }
-        photoframeCanvasGroup.alpha = 0f;
         photoframe.SetActive(false);
+        photoframeCanvasGroup.alpha = 0f;
     }
 }

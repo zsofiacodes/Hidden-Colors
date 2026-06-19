@@ -175,44 +175,67 @@ public class CameraManager : MonoBehaviour
 
     private void TakeSnapShot(int id)
     {
-        cameraUI.ShowCameraUI(false);
-        
+        // 1. Capture the images
         ScreenCaptureLogic(id, "poverty", povertyRT);
-
         ScreenCaptureLogic(id, "normal", normalRT);
 
-        cameraUI.ShowCameraUI(true);
+        // 2. Load and display immediately
+        Sprite photo = LoadSingleImage(id, "normal");
+        cameraUI.ReceiveTakenPicture(photo);
+
+        // 3. Handle game logic
         UseBattery();
-        StartCoroutine(ShowPhoto(id, "normal"));
+
+        // 4. Start the sequence timer
+        StartCoroutine(DisplayAndCloseSequence());
+    }
+
+    private IEnumerator DisplayAndCloseSequence()
+    {
+        // The photo is already visible. 
+        // We wait for the 3 seconds requested.
+        yield return new WaitForSeconds(3f);
+
+        // After the wait, clean up UI and exit the mode
+        cameraUI.HidePhotoFrame();
+        ExitCameraMode();
     }
 
     private void ScreenCaptureLogic(int areaID, string state, RenderTexture rt)
     {
-        RenderTexture.active = rt;
+        // Create a temporary Render Texture that is explicitly in sRGB format
+        RenderTextureDescriptor desc = new RenderTextureDescriptor(rt.width, rt.height, RenderTextureFormat.ARGB32, 0);
+        desc.sRGB = true; // This forces the color conversion!
 
+        RenderTexture tempRT = RenderTexture.GetTemporary(desc);
+
+        // Copy the contents of your camera's RT to our sRGB-enabled temporary RT
+        Graphics.Blit(rt, tempRT);
+
+        // Now read from the temporary RT
+        RenderTexture.active = tempRT;
         Texture2D texture = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
-
         texture.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
         texture.Apply();
+        RenderTexture.active = null;
 
+        // Clean up
+        RenderTexture.ReleaseTemporary(tempRT);
+
+        // Save to file
+        string fileName = $"Area{areaID}_{state}.png";
+        string path = Path.Combine(Application.persistentDataPath, fileName);
+        byte[] bytes = texture.EncodeToPNG();
+        File.WriteAllBytes(path, bytes);
+
+        // Create sprite for UI
         Sprite screenshotSprite = Sprite.Create(
             texture,
             new Rect(0, 0, texture.width, texture.height),
             new Vector2(0.5f, 0.5f)
         );
 
-        string fileName = $"Area{areaID}_{state}.png";
-        string path = Path.Combine(Application.persistentDataPath, fileName);
-
-        byte[] bytes = texture.EncodeToPNG();
-        File.WriteAllBytes(path, bytes);
-
-        //Destroy(texture);
-
         screenCapture = screenshotSprite;
-
-        //OpenSaveFolder();
-        // Removed OpenSaveFolder from here so it doesn't open twice per snapshot
     }
 
     public void OpenSaveFolder()
@@ -258,7 +281,8 @@ public class CameraManager : MonoBehaviour
     {
         cameraUI.ReceiveTakenPicture(LoadSingleImage(areaID, state));
 
-        yield return new WaitForSeconds(5f);
+        // Reduced to 1 second for a quick "snap" feel
+        yield return new WaitForSeconds(1f);
 
         ExitCameraMode();
     }

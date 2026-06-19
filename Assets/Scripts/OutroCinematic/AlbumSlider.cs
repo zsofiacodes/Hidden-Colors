@@ -1,34 +1,31 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
-public class AlbumSlider : MonoBehaviour, IDragHandler
+public class AlbumSlider : MonoBehaviour
 {
-    [SerializeField] private Image sliderMask; // Drag your SliderMask object here
+    [SerializeField] private Image sliderMask;
 
-    // This allows the player to drag their mouse across the photo slot
-    public void OnDrag(PointerEventData eventData)
+    public void ShowAlbum()
     {
-        // Calculate the position of the mouse relative to this object
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            GetComponent<RectTransform>(),
-            eventData.position,
-            eventData.pressEventCamera,
-            out Vector2 localPoint);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+    }
 
-        // Get the width of the slot
-        float width = GetComponent<RectTransform>().rect.width;
+    // Call this if you need to hide it again (e.g., if the animation resumes)
+    public void HideAlbum()
+    {
+        // Only lock if you don't need the mouse for something else
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
 
-        // Calculate a 0 to 1 value based on where the mouse is
-        float normalizedValue = (localPoint.x + (width / 2)) / width;
-
-        // Clamp the value so it stays between 0 and 1
-        normalizedValue = Mathf.Clamp01(normalizedValue);
-
-        // Apply it to the mask's fillAmount
+    // The 'public' is what allows the Slider to call this function
+    public void OnSliderChanged(float value)
+    {
+        Debug.Log("Slider moved to: " + value);
         if (sliderMask != null)
         {
-            sliderMask.fillAmount = normalizedValue;
+            sliderMask.fillAmount = value;
         }
     }
 }
