@@ -29,14 +29,6 @@ public class TutorialManager : MonoBehaviour
         return true;
     }
 
-    private void Update()
-    {
-        if (Keyboard.current.oKey.wasPressedThisFrame)
-        {
-            PlayerPrefs.DeleteAll();
-        }
-    }
-
     private void CloseTutorial()
     {
         tutorialPanel.SetActive(false);

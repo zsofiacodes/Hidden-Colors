@@ -43,10 +43,17 @@ public class PlayerInteractIndicator : MonoBehaviour
         Vector3 targetPositionWithOffset = targetObject.position + worldOffset;
         Vector3 screenPos = Camera.main.WorldToScreenPoint(targetPositionWithOffset);
 
-        if (screenPos.z > 0)
-        {
-            uiElement.position = screenPos;
-        }
+        uiElement.position = screenPos;
+
+        //if (screenPos.z > 0)
+        //{
+        //    uiElement.position = screenPos;
+        //    Debug.Log($"True");
+        //}
+        //else
+        //{
+        //    Debug.Log($"False");
+        //}
     }
 
     public void IndiactorHelperMethod(bool value)

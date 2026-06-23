@@ -30,6 +30,12 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         SetState(GameState.MainMenu);
+        ResetPlayerPrefs();
+    }
+
+    private void ResetPlayerPrefs()
+    {
+        PlayerPrefs.DeleteAll();
     }
 
     public void SetState(GameState newState)

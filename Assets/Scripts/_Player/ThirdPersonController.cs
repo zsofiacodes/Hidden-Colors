@@ -18,6 +18,7 @@ public class ThirdPersonController : MonoBehaviour
     [Header("References")]
     [SerializeField] private Transform cameraTarget;
     [SerializeField] private Animator animator;
+    [SerializeField] private Animator animatorPoverty;
 
     private Rigidbody rb;
     private Vector2 moveInput;
@@ -52,6 +53,16 @@ public class ThirdPersonController : MonoBehaviour
             animator.SetFloat("Speed", currentHorizontalSpeed / runSpeed);
             animator.SetBool("Grounded", isGrounded);
             animator.SetBool("Falling", !isGrounded && rb.linearVelocity.y < -0.1f);
+        }
+
+        if (animatorPoverty != null)
+        {
+            float currentHorizontalSpeed =
+                new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).magnitude;
+
+            animatorPoverty.SetFloat("Speed", currentHorizontalSpeed / runSpeed);
+            animatorPoverty.SetBool("Grounded", isGrounded);
+            animatorPoverty.SetBool("Falling", !isGrounded && rb.linearVelocity.y < -0.1f);
         }
     }
 

@@ -11,6 +11,7 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private CameraUI cameraUI;
     [SerializeField] private CinemachineCamera photoPOVCamera;
     [SerializeField] private GameObject playerMesh;
+    [SerializeField] private GameObject playerMeshPoverty;
     [SerializeField] private ThirdPersonController playerController;
 
     [SerializeField] private float interactRange = 5f;
@@ -118,6 +119,7 @@ public class CameraManager : MonoBehaviour
         photoPOVCamera.Priority = 20;
         isCameraModeActive = true;
         playerMesh.SetActive(false);
+        playerMeshPoverty.SetActive(false);
         playerController.enabled = false;
         cameraUI.ShowCameraUI(true);
         OnPhotomode?.Invoke(false);
@@ -130,6 +132,7 @@ public class CameraManager : MonoBehaviour
         photoPOVCamera.Priority = 5;
         isCameraModeActive = false;
         playerMesh.SetActive(true);
+        playerMeshPoverty.SetActive(true);
         playerController.enabled = true;
         cameraUI.ShowCameraUI(false);
         OnPhotomode?.Invoke(true);
